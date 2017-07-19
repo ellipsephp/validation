@@ -12,19 +12,21 @@ use Ellipse\Validation\Exceptions\DataInvalidException;
 abstract class AbstractValidationMiddleware implements MiddlewareInterface
 {
     /**
-     * The validator.
+     * The validator factory.
      *
-     * @var \Ellipse\Validation\Validator
+     * @var \Ellipse\Validation\ValidatorFactory
      */
     private $validator;
 
     /**
      * Set up a validator middleware with  the template engine receiving the
      * values.
+     *
+     * @param \Ellipse\Validation\ValidatorFactory
      */
-    public function __construct(Validator $validator)
+    public function __construct(ValidatorFactory $factory)
     {
-        $this->validator = $validator;
+        $this->factory = $factory;
     }
 
     /**
@@ -73,7 +75,11 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
         $labels = $this->getLabels();
         $messages = $this->getMessages();
 
-        $errors = $this->validator->validate($input, $rules, $labels, $messages);
+        $validator = $this->factory->create($rules)
+            ->withLabels($labels)
+            ->withMessages($messages);
+
+        $errors = $validator->validate($input);
 
         if (count($errors) == 0) {
 

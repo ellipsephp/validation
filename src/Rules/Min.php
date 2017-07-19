@@ -30,6 +30,6 @@ class Min
     {
         if ($fields[$key] >= $this->limit) return;
 
-        throw new ValidationException('min', $key, [$fields[$key], $this->limit]);
+        throw new ValidationException('min', $fields, $key, [$this->limit]);
     }
 }

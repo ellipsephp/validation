@@ -6,6 +6,7 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 
 use Ellipse\Validation\AbstractValidationMiddleware;
+use Ellipse\Validation\ValidatorFactory;
 use Ellipse\Validation\Validator;
 use Ellipse\Validation\Exceptions\DataInvalidException;
 
@@ -17,10 +18,11 @@ describe('AbstractValidationMiddleware', function () {
         $this->response = Mockery::mock(ResponseInterface::class);
         $this->delegate = Mockery::mock(DelegateInterface::class);
 
+        $this->factory = Mockery::mock(ValidatorFactory::class);
         $this->validator = Mockery::mock(Validator::class);
 
         $this->middleware = Mockery::mock(AbstractValidationMiddleware::class . '[getRules, getLabels, getMessages]', [
-            $this->validator,
+            $this->factory,
         ]);
 
     });
@@ -46,6 +48,9 @@ describe('AbstractValidationMiddleware', function () {
             $this->labels = ['key' => 'Field name'];
             $this->messages = ['key' => '{{name}} template'];
 
+            $validator1 = Mockery::mock(Validator::class);
+            $validator2 = Mockery::mock(Validator::class);
+
             $this->request->shouldReceive('getParsedBody')->once()
                 ->andReturn($this->input);
 
@@ -58,6 +63,18 @@ describe('AbstractValidationMiddleware', function () {
             $this->middleware->shouldReceive('getMessages')->once()
                 ->andReturn($this->messages);
 
+            $this->factory->shouldReceive('create')->once()
+                ->with($this->rules)
+                ->andReturn($validator1);
+
+            $validator1->shouldReceive('withLabels')->once()
+                ->with($this->labels)
+                ->andReturn($validator2);
+
+            $validator2->shouldReceive('withMessages')->once()
+                ->with($this->messages)
+                ->andReturn($this->validator);
+
         });
 
         context('when the input pass the validation', function () {
@@ -67,7 +84,7 @@ describe('AbstractValidationMiddleware', function () {
                 $errors = [];
 
                 $this->validator->shouldReceive('validate')->once()
-                    ->with($this->input, $this->rules, $this->labels, $this->messages)
+                    ->with($this->input)
                     ->andReturn($errors);
 
                 $this->delegate->shouldReceive('process')->once()
@@ -89,7 +106,7 @@ describe('AbstractValidationMiddleware', function () {
                 $errors = ['key' => 'error'];
 
                 $this->validator->shouldReceive('validate')->once()
-                    ->with($this->input, $this->rules, $this->labels, $this->messages)
+                    ->with($this->input)
                     ->andReturn($errors);
 
                 expect([$this->middleware, 'process'])->with($this->request, $this->delegate)

@@ -31,7 +31,7 @@ class Between
             $min = $this->min->getLimit();
             $max = $this->max->getLimit();
 
-            throw new ValidationException('between', $key, [$fields[$key], $min, $max]);
+            throw new ValidationException('between', $fields, $key, [$min, $max]);
 
         }
     }

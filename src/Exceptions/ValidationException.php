@@ -7,12 +7,14 @@ use Exception;
 class ValidationException extends Exception implements ValidationExceptionInterface
 {
     private $token;
+    private $fields;
     private $key;
     private $parameters;
 
-    public function __construct(string $token, string $key, array $parameters = [])
+    public function __construct(string $token, array $fields, string $key, array $parameters = [])
     {
         $this->token = $token;
+        $this->fields = $fields;
         $this->key = $key;
         $this->parameters = $parameters;
     }
@@ -20,6 +22,11 @@ class ValidationException extends Exception implements ValidationExceptionInterf
     public function getToken(): string
     {
         return $this->token;
+    }
+
+    public function getFields(): array
+    {
+        return $this->fields;
     }
 
     public function getKey(): string

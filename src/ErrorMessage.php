@@ -18,10 +18,11 @@ class ErrorMessage
     public function getMessage(): string
     {
         $token = $this->exception->getToken();
+        $fields = $this->exception->getFields();
         $key = $this->exception->getKey();
         $parameters = $this->exception->getParameters();
 
-        return ($this->translate)($token, $key, $parameters);
+        return ($this->translate)($token, $fields, $key, $parameters);
     }
 
     public function __toString()

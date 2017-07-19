@@ -10,6 +10,6 @@ class Required
     {
         if (array_key_exists($key, $fields)) return;
 
-        throw new ValidationException('required', $key);
+        throw new ValidationException('required', $fields, $key);
     }
 }
