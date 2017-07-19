@@ -16,7 +16,7 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
      *
      * @var \Ellipse\Validation\ValidatorFactory
      */
-    private $validator;
+    private $factory;
 
     /**
      * Set up a validator middleware with  the template engine receiving the
@@ -37,7 +37,7 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
     abstract public function getRules(): array;
 
     /**
-     * Return an array associating fields to labels. Can be overrided by the
+     * Return an array associating key to labels. Can be overrided by the
      * user.
      *
      * @return array
@@ -48,12 +48,12 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Return an array associating field to messages. It can be overrided by the
+     * Return an array associating key to templates. It can be overrided by the
      * user.
      *
      * @return array
      */
-    public function getMessages(): array
+    public function getTemplates(): array
     {
         return [];
     }
@@ -73,11 +73,11 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
 
         $rules = $this->getRules();
         $labels = $this->getLabels();
-        $messages = $this->getMessages();
+        $templates = $this->getTemplates();
 
-        $validator = $this->factory->create($rules)
+        $validator = $this->factory->getValidator($rules)
             ->withLabels($labels)
-            ->withMessages($messages);
+            ->withTemplates($templates);
 
         $errors = $validator->validate($input);
 

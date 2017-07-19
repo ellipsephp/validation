@@ -5,7 +5,7 @@ namespace Ellipse\Validation;
 class ValidatorFactory
 {
     private $factories;
-    private $messages;
+    private $translator;
 
     private static $defaults = [
         Rules\Required::class => 'The field :field is required.',
@@ -19,11 +19,11 @@ class ValidatorFactory
      *
      * @return \Ellipse\Validator\ValidatorFactory
      */
-    public static function createWithDefaults(): ValidatorFactory
+    public static function create(): ValidatorFactory
     {
-        $factory = new ValidatorFactory;
-        $factory = $factory->withDefaultFactories();
-        $factory = $factory->withDefaultMessages();
+        $factory = new ValidatorFactory([], new Translator);
+        $factory = $factory->withBuiltInFactories();
+        $factory = $factory->withBuiltInTemplates();
 
         return $factory;
     }
@@ -35,7 +35,7 @@ class ValidatorFactory
         return strtolower(end($parts));
     }
 
-    private function withDefaultFactories(): ValidatorFactory
+    private function withBuiltInFactories(): ValidatorFactory
     {
         $rules = array_keys(self::$defaults);
 
@@ -52,44 +52,49 @@ class ValidatorFactory
         }, $this);
     }
 
-    private function withDefaultMessages(): ValidatorFactory
+    private function withBuiltInTemplates(): ValidatorFactory
     {
         $rules = array_keys(self::$defaults);
 
-        $messages = array_reduce($rules, function ($messages, $rule) {
+        return array_reduce($rules, function ($factory, $rule) {
 
             $name = self::getNameFromRuleClass($rule);
-            $message = self::$defaults[$rule];
+            $template = self::$defaults[$rule];
 
-            return array_merge($messages, [$name => $message]);
+            return $factory->withDefaultTemplates([$name => $template]);
 
-        }, []);
-
-        return $this->withMessages($messages);
+        }, $this);
     }
 
-    public function __construct(array $factories = [], array $messages = [])
+    public function __construct(array $factories = [], Translator $translator)
     {
         $this->factories = $factories;
-        $this->messages = $messages;
+        $this->translator = $translator;
     }
 
-    public function create(array $rules = []): Validator
+    public function getValidator(array $rules = []): Validator
     {
-        return new Validator($rules, $this->factories, [], $this->messages);
+        return new Validator($rules, $this->translator, $this->factories);
     }
 
     public function withRuleFactory(string $name, callable $factory): ValidatorFactory
     {
         $factories = array_merge($this->factories, [$name => $factory]);
 
-        return new ValidatorFactory($factories, $this->messages);
+        return new ValidatorFactory($factories, $this->translator);
     }
 
-    public function withMessages(array $messages = []): ValidatorFactory
+    public function withDefaultLabels(array $labels): ValidatorFactory
     {
-        $messages = array_merge($this->messages, $messages);
+        $translator = $this->translator->withLabels($labels);
 
-        return new ValidatorFactory($this->factories, $messages);
+        return new ValidatorFactory($this->factories, $translator);
+    }
+
+    public function withDefaultTemplates(array $templates): ValidatorFactory
+    {
+        $translator = $this->translator->withTemplates($templates);
+
+        return new ValidatorFactory($this->factories, $translator);
     }
 }

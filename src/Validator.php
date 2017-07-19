@@ -7,58 +7,52 @@ use Ellipse\Validation\Exceptions\ValidationException;
 class Validator
 {
     private $rules;
+    private $translator;
     private $factories;
-    private $labels;
-    private $messages;
 
     public function __construct(
         array $rules = [],
-        array $factories = [],
-        array $labels = [],
-        array $messages = []
+        Translator $translator,
+        array $factories = []
     ) {
 
         $this->rules = $rules;
+        $this->translator = $translator;
         $this->factories = $factories;
-        $this->labels = $labels;
-        $this->messages = $messages;
-        $this->translate = new Translator;
 
     }
 
-    public function withLabels(array $labels = []): Validator
+    public function withLabels(array $labels): Validator
     {
-        $labels = array_merge($this->labels, $labels);
+        $translator = $this->translator->withLabels($labels);
 
-        return new Validator($this->rules, $this->factories, $labels, $this->messages);
+        return new Validator($this->rules, $translator, $this->factories);
     }
 
-    public function withMessages(array $messages = []): Validator
+    public function withTemplates(array $templates): Validator
     {
-        $messages = array_merge($this->messages, $messages);
+        $translator = $this->translator->withTemplates($templates);
 
-        return new Validator($this->rules, $this->factories, $this->labels, $messages);
+        return new Validator($this->rules, $translator, $this->factories);
     }
 
     public function validate(array $input = []): array
     {
-        $errors = [];
+        $messages = [];
 
         foreach ($this->rules as $key => $definition) {
 
             $rules = $this->getRulesCollection($definition);
 
-            $exceptions = $rules->collectExceptions($input, $key);
+            $errors = $rules->getErrors($input, $key);
 
-            $errors = array_merge($errors, array_map(function ($exception) {
+            $new_messages = array_map([$this->translator, 'translate'], $errors);
 
-                return new ErrorMessage($exception, $this->translate);
-
-            }, $exceptions));
+            $messages = array_merge($messages, $new_messages);
 
         }
 
-        return $errors;
+        return $messages;
     }
 
     private function getRuleFactory(string $name): callable
@@ -72,11 +66,11 @@ class Validator
         throw new \Exception('Rule factory not defined');
     }
 
-    private function getRule($definition): callable
+    private function getRule($definition): Rule
     {
         if (is_callable($definition)) {
 
-            return $definition;
+            return new Rule($definition);
 
         }
 
@@ -88,7 +82,9 @@ class Validator
 
         $factory = $this->getRuleFactory($name);
 
-        return $factory($parameters);
+        $assert = $factory($parameters);
+
+        return new NamedRule($name, $assert);
     }
 
     private function getRulesCollection($definition)
@@ -101,7 +97,7 @@ class Validator
 
         if (is_callable($definition)) {
 
-            return new RulesCollection([$definition]);
+            $definition = [$definition];
 
         }
 

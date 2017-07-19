@@ -13,26 +13,29 @@ class RulesCollection
         $this->rules = $rules;
     }
 
-    public function collectExceptions(array $fields, string $key): array
+    public function getErrors(array $fields, string $key): array
     {
-        $exceptions = [];
+        $errors = [];
 
         foreach ($this->rules as $rule) {
 
             try {
 
-                $rule($fields, $key);
+                $rule->assert($fields, $key);
 
             }
 
             catch (ValidationException $e) {
 
-                $exceptions[] = $e;
+                $name = $rule instanceof NamedRule ? $rule->getName() : $key;
+                $parameters = $e->getParameters();
+
+                $errors[] = new Error($name, $key, $parameters);
 
             }
 
         }
 
-        return $exceptions;
+        return $errors;
     }
 }

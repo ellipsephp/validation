@@ -21,7 +21,7 @@ describe('AbstractValidationMiddleware', function () {
         $this->factory = Mockery::mock(ValidatorFactory::class);
         $this->validator = Mockery::mock(Validator::class);
 
-        $this->middleware = Mockery::mock(AbstractValidationMiddleware::class . '[getRules, getLabels, getMessages]', [
+        $this->middleware = Mockery::mock(AbstractValidationMiddleware::class . '[getRules, getLabels, getTemplates]', [
             $this->factory,
         ]);
 
@@ -46,7 +46,7 @@ describe('AbstractValidationMiddleware', function () {
             $this->input = ['key' => 'value'];
             $this->rules = ['key' => 'required'];
             $this->labels = ['key' => 'Field name'];
-            $this->messages = ['key' => '{{name}} template'];
+            $this->templates = ['key' => '{{name}} template'];
 
             $validator1 = Mockery::mock(Validator::class);
             $validator2 = Mockery::mock(Validator::class);
@@ -60,10 +60,10 @@ describe('AbstractValidationMiddleware', function () {
             $this->middleware->shouldReceive('getLabels')->once()
                 ->andReturn($this->labels);
 
-            $this->middleware->shouldReceive('getMessages')->once()
-                ->andReturn($this->messages);
+            $this->middleware->shouldReceive('getTemplates')->once()
+                ->andReturn($this->templates);
 
-            $this->factory->shouldReceive('create')->once()
+            $this->factory->shouldReceive('getValidator')->once()
                 ->with($this->rules)
                 ->andReturn($validator1);
 
@@ -71,8 +71,8 @@ describe('AbstractValidationMiddleware', function () {
                 ->with($this->labels)
                 ->andReturn($validator2);
 
-            $validator2->shouldReceive('withMessages')->once()
-                ->with($this->messages)
+            $validator2->shouldReceive('withTemplates')->once()
+                ->with($this->templates)
                 ->andReturn($this->validator);
 
         });

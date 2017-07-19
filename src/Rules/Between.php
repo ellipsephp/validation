@@ -17,8 +17,8 @@ class Between
         $this->max = new Max($max);
     }
 
-    public function __invoke(array $fields, string $key) {
-
+    public function __invoke(array $fields, string $key)
+    {
         try {
 
             ($this->min)($fields, $key);
@@ -31,7 +31,7 @@ class Between
             $min = $this->min->getLimit();
             $max = $this->max->getLimit();
 
-            throw new ValidationException('between', $fields, $key, [$min, $max]);
+            throw new ValidationException(['min' => $min, 'max' => $max]);
 
         }
     }
