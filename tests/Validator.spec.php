@@ -7,12 +7,6 @@ use Ellipse\Validation\Exceptions\ValidationException;
 
 describe('Validator', function () {
 
-    beforeEach(function () {
-
-        $this->translator = Mockery::mock(Translator::class);
-
-    });
-
     afterEach(function () {
 
         Mockery::close();
@@ -23,11 +17,12 @@ describe('Validator', function () {
 
         it('should return a new validator with the given labels', function () {
 
-            $validator = new Validator([], $this->translator);
-
+            $translator = Mockery::mock(Translator::class);
             $new_translator = Mockery::mock(Translator::class);
 
-            $this->translator->shouldReceive('withLabels')->once()
+            $validator = new Validator([], $translator);
+
+            $translator->shouldReceive('withLabels')->once()
                 ->with(['key' => 'label'])
                 ->andReturn($new_translator);
 
@@ -44,11 +39,12 @@ describe('Validator', function () {
 
         it('should return a new validator with the given templates', function () {
 
-            $validator = new Validator([], $this->translator);
-
+            $translator = Mockery::mock(Translator::class);
             $new_translator = Mockery::mock(Translator::class);
 
-            $this->translator->shouldReceive('withTemplates')->once()
+            $validator = new Validator([], $translator);
+
+            $translator->shouldReceive('withTemplates')->once()
                 ->with(['key' => 'template'])
                 ->andReturn($new_translator);
 
@@ -68,7 +64,7 @@ describe('Validator', function () {
             $input = ['key1' => 'value1', 'key2' => 'value2'];
             $rules = ['key1' => function () {}];
 
-            $validator = new Validator($rules, $this->translator);
+            $validator = new Validator($rules, new Translator);
 
             $test = $validator->validate($input);
 
@@ -86,17 +82,16 @@ describe('Validator', function () {
 
             }];
 
-            $validator = new Validator($rules, $this->translator);
+            $validator = new Validator($rules, new Translator);
 
-            $this->translator->shouldReceive('translate')->once()
-                ->with(Mockery::type(Error::class))
-                ->andReturn('error');
+            $validator = $validator->withLabels(['key1' => 'the key']);
+            $validator = $validator->withTemplates(['key1' => ':attribute failed']);
 
             $test = $validator->validate($input);
 
             expect($test)->to->be->an('array');
             expect($test)->to->have->length(1);
-            expect($test[0])->to->be->equal('error');
+            expect($test[0])->to->be->equal('the key failed');
 
         });
 
@@ -118,22 +113,16 @@ describe('Validator', function () {
                 ],
             ];
 
-            $validator = new Validator($rules, $this->translator);
+            $validator = new Validator($rules, new Translator);
 
-            $this->translator->shouldReceive('translate')->once()
-                ->with(Mockery::type(Error::class))
-                ->andReturn('error1');
-
-            $this->translator->shouldReceive('translate')->once()
-                ->with(Mockery::type(Error::class))
-                ->andReturn('error2');
+            $validator = $validator->withLabels(['key1' => 'the key']);
+            $validator = $validator->withTemplates(['key1' => ':attribute failed']);
 
             $test = $validator->validate($input);
 
             expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test[0])->to->be->equal('error1');
-            expect($test[1])->to->be->equal('error2');
+            expect($test)->to->have->length(1);
+            expect($test[0])->to->be->equal('the key failed');
 
         });
 
@@ -151,17 +140,16 @@ describe('Validator', function () {
 
             }];
 
-            $validator = new Validator($rules, $this->translator, $factories);
+            $validator = new Validator($rules, new Translator, $factories);
 
-            $this->translator->shouldReceive('translate')->once()
-                ->with(Mockery::type(Error::class))
-                ->andReturn('error');
+            $validator = $validator->withLabels(['key1' => 'the key']);
+            $validator = $validator->withTemplates(['key1.SomeRule' => ':attribute failed']);
 
             $test = $validator->validate($input);
 
             expect($test)->to->be->an('array');
             expect($test)->to->have->length(1);
-            expect($test[0])->to->be->equal('error');
+            expect($test[0])->to->be->equal('the key failed');
 
         });
 
@@ -190,22 +178,62 @@ describe('Validator', function () {
                 },
             ];
 
-            $validator = new Validator($rules, $this->translator, $factories);
+            $validator = new Validator($rules, new Translator, $factories);
 
-            $this->translator->shouldReceive('translate')->once()
-                ->with(Mockery::type(Error::class))
-                ->andReturn('error1');
-
-            $this->translator->shouldReceive('translate')->once()
-                ->with(Mockery::type(Error::class))
-                ->andReturn('error2');
+            $validator = $validator->withLabels(['key1' => 'the key']);
+            $validator = $validator->withTemplates([
+                'key1.SomeRule' => ':attribute failed 1',
+                'key1.SomeOtherRule' => ':attribute failed 2',
+            ]);
 
             $test = $validator->validate($input);
 
             expect($test)->to->be->an('array');
             expect($test)->to->have->length(2);
-            expect($test[0])->to->be->equal('error1');
-            expect($test[1])->to->be->equal('error2');
+            expect($test[0])->to->be->equal('the key failed 1');
+            expect($test[1])->to->be->equal('the key failed 2');
+
+        });
+
+        it('should allow to validate nested arrays', function () {
+
+            $input = [
+                'blog' => [
+                    'posts' => [
+                        [
+                            'title' => 'title',
+                            'comments' => [
+                                ['body' => 'body'],
+                                ['body' => 'body'],
+                            ],
+                        ],
+                    ],
+                ],
+            ];
+
+            $rules = [
+                'blog.posts.*.title' => function () { throw new ValidationException; },
+                'blog.posts.*.comments.*.body' => function () { throw new ValidationException; },
+            ];
+
+            $validator = new Validator($rules, new Translator);
+
+            $validator = $validator->withLabels([
+                'blog.posts.*.title' => 'blog posts title',
+                'blog.posts.*.comments.*.body' => 'blog posts comments body',
+            ]);
+
+            $validator = $validator->withTemplates([
+                'blog.posts.*.title' => ':attribute failed',
+                'blog.posts.*.comments.*.body' => ':attribute failed',
+            ]);
+
+            $test = $validator->validate($input);
+
+            expect($test)->to->be->an('array');
+            expect($test)->to->have->length(2);
+            expect($test[0])->to->be->equal('blog posts title failed');
+            expect($test[1])->to->be->equal('blog posts comments body failed');
 
         });
 

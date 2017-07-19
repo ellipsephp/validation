@@ -38,57 +38,62 @@ class Validator
 
     public function validate(array $input = []): array
     {
-        $messages = [];
+        $errors = [];
 
-        foreach ($this->rules as $key => $definition) {
+        $input = $this->getFlattenedOutInput($input);
+        $map = $this->getRulesMap($input);
 
-            $rules = $this->getRulesCollection($definition);
+        foreach ($map as $input_key => $rule_key) {
 
-            $errors = $rules->getErrors($input, $key);
+            $collection = $this->getRulesCollection($rule_key);
 
-            $new_messages = array_map([$this->translator, 'translate'], $errors);
+            $new_errors = $collection->getErrors($input, $input_key);
 
-            $messages = array_merge($messages, $new_messages);
-
-        }
-
-        return $messages;
-    }
-
-    private function getRuleFactory(string $name): callable
-    {
-        if (array_key_exists($name, $this->factories)) {
-
-            return $this->factories[$name];
+            $errors = array_merge($errors, $new_errors);
 
         }
 
-        throw new \Exception('Rule factory not defined');
+        return array_map([$this->translator, 'translate'], array_values($errors));
     }
 
-    private function getRule($definition): Rule
+    private function getFlattenedOutInput(array $input, string $prefix = ''): array
     {
-        if (is_callable($definition)) {
+        $keys = array_keys($input);
 
-            return new Rule($definition);
+        return array_reduce($keys, function ($flattened, $key) use ($input, $prefix) {
 
-        }
+            $namespace = $prefix . $key;
+            $value = $input[$key];
 
-        [$name, $parameters] = explode(':', $definition);
-        $parameters = explode(',', $parameters);
+            return array_merge($flattened, is_array($value)
+                ? $this->getFlattenedOutInput($value, $namespace . '.')
+                : [$namespace => $value]);
 
-        $name = trim($name);
-        $parameters = array_map('trim', $parameters);
-
-        $factory = $this->getRuleFactory($name);
-
-        $assert = $factory($parameters);
-
-        return new NamedRule($name, $assert);
+        }, []);
     }
 
-    private function getRulesCollection($definition)
+    private function getRulesMap(array $input): array
     {
+        $rules_keys = array_keys($this->rules);
+        $input_keys = array_keys($input);
+
+        return array_reduce($rules_keys, function ($map, $rule_key) use ($input_keys) {
+
+            $pattern = '#^' . str_replace('*', '[0-9]+?', $rule_key) . '$#';
+
+            $keys = preg_grep($pattern, $input_keys);
+            $values = array_pad([], count($keys), $rule_key);
+            $mapped = array_combine($keys, $values);
+
+            return array_merge($map, $mapped);
+
+        }, []);
+    }
+
+    private function getRulesCollection(string $key): RulesCollection
+    {
+        $definition = $this->rules[$key];
+
         if (is_string($definition)) {
 
             $definition = array_map('trim', explode('|', $definition));
@@ -103,12 +108,48 @@ class Validator
 
         if (is_array($definition)) {
 
-            $rules = array_map([$this, 'getRule'], $definition);
+            $rules = array_map(function ($definition) use ($key) {
+
+                return $this->getRule($key, $definition);
+
+            }, $definition);
 
             return new RulesCollection($rules);
 
         }
 
         throw new \Exception('Invalid rules format');
+    }
+
+    private function getRule(string $key, $definition): Rule
+    {
+        if (is_callable($definition)) {
+
+            return new Rule($key, $definition);
+
+        }
+
+        [$name, $parameters] = explode(':', $definition);
+        $parameters = explode(',', $parameters);
+
+        $name = trim($name);
+        $parameters = array_map('trim', $parameters);
+
+        $factory = $this->getRuleFactory($name);
+
+        $assert = $factory($parameters);
+
+        return new NamedRule($name, $key, $assert);
+    }
+
+    private function getRuleFactory(string $name): callable
+    {
+        if (array_key_exists($name, $this->factories)) {
+
+            return $this->factories[$name];
+
+        }
+
+        throw new \Exception('Rule factory not defined');
     }
 }

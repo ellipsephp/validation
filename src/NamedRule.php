@@ -6,11 +6,11 @@ class NamedRule extends Rule
 {
     private $name;
 
-    public function __construct(string $name, callable $assert)
+    public function __construct(string $name, string $key, callable $assert)
     {
         $this->name = $name;
 
-        parent::__construct($assert);
+        parent::__construct($key, $assert);
     }
 
     public function getName(): string

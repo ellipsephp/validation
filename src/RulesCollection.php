@@ -27,10 +27,11 @@ class RulesCollection
 
             catch (ValidationException $e) {
 
-                $name = $rule instanceof NamedRule ? $rule->getName() : $key;
+                $name = $rule instanceof NamedRule ? $rule->getName() : $rule->getKey();
+                $key = $rule->getKey();
                 $parameters = $e->getParameters();
 
-                $errors[] = new Error($name, $key, $parameters);
+                $errors[$key . '.' . $name] = new Error($name, $key, $parameters);
 
             }
 
