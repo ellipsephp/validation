@@ -79,14 +79,14 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
             ->withLabels($labels)
             ->withTemplates($templates);
 
-        $errors = $validator->validate($input);
+        $result = $validator->validate($input);
 
-        if (count($errors) == 0) {
+        if ($result->passed()) {
 
             return $delegate->process($request);
 
         }
 
-        throw new DataInvalidException($errors);
+        throw new DataInvalidException($result->getMessages());
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
 use Ellipse\Validation\Validator;
-use Ellipse\Validation\Error;
 use Ellipse\Validation\Translator;
+use Ellipse\Validation\ValidationResult;
 use Ellipse\Validation\Exceptions\ValidationException;
 
 describe('Validator', function () {
@@ -68,8 +68,8 @@ describe('Validator', function () {
 
             $test = $validator->validate($input);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->be->empty();
+            expect($test)->to->be->an->instanceof(ValidationResult::class);
+            expect($test->passed())->to->be->true();
 
         });
 
@@ -89,9 +89,10 @@ describe('Validator', function () {
 
             $test = $validator->validate($input);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(1);
-            expect($test[0])->to->be->equal('the key failed');
+            expect($test)->to->be->an->instanceof(ValidationResult::class);
+            expect($test->passed())->to->be->false();
+            expect($test->getMessages())->to->have->length(1);
+            expect($test->getMessages()[0])->to->be->equal('the key failed');
 
         });
 
@@ -120,9 +121,10 @@ describe('Validator', function () {
 
             $test = $validator->validate($input);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(1);
-            expect($test[0])->to->be->equal('the key failed');
+            expect($test)->to->be->an->instanceof(ValidationResult::class);
+            expect($test->passed())->to->be->false();
+            expect($test->getMessages())->to->have->length(1);
+            expect($test->getMessages()[0])->to->be->equal('the key failed');
 
         });
 
@@ -147,9 +149,10 @@ describe('Validator', function () {
 
             $test = $validator->validate($input);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(1);
-            expect($test[0])->to->be->equal('the key failed');
+            expect($test)->to->be->an->instanceof(ValidationResult::class);
+            expect($test->passed())->to->be->false();
+            expect($test->getMessages())->to->have->length(1);
+            expect($test->getMessages()[0])->to->be->equal('the key failed');
 
         });
 
@@ -188,10 +191,11 @@ describe('Validator', function () {
 
             $test = $validator->validate($input);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test[0])->to->be->equal('the key failed 1');
-            expect($test[1])->to->be->equal('the key failed 2');
+            expect($test)->to->be->an->instanceof(ValidationResult::class);
+            expect($test->passed())->to->be->false();
+            expect($test->getMessages())->to->have->length(2);
+            expect($test->getMessages()[0])->to->be->equal('the key failed 1');
+            expect($test->getMessages()[1])->to->be->equal('the key failed 2');
 
         });
 
@@ -230,10 +234,11 @@ describe('Validator', function () {
 
             $test = $validator->validate($input);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test[0])->to->be->equal('blog posts title failed');
-            expect($test[1])->to->be->equal('blog posts comments body failed');
+            expect($test)->to->be->an->instanceof(ValidationResult::class);
+            expect($test->passed())->to->be->false();
+            expect($test->getMessages())->to->have->length(2);
+            expect($test->getMessages()[0])->to->be->equal('blog posts title failed');
+            expect($test->getMessages()[1])->to->be->equal('blog posts comments body failed');
 
         });
 

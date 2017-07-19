@@ -8,6 +8,7 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Ellipse\Validation\AbstractValidationMiddleware;
 use Ellipse\Validation\ValidatorFactory;
 use Ellipse\Validation\Validator;
+use Ellipse\Validation\ValidationResult;
 use Ellipse\Validation\Exceptions\DataInvalidException;
 
 describe('AbstractValidationMiddleware', function () {
@@ -81,11 +82,13 @@ describe('AbstractValidationMiddleware', function () {
 
             it('should delegate the processing to the next middleware', function () {
 
-                $errors = [];
+                $result = Mockery::mock(ValidationResult::class);
 
                 $this->validator->shouldReceive('validate')->once()
                     ->with($this->input)
-                    ->andReturn($errors);
+                    ->andReturn($result);
+
+                $result->shouldReceive('passed')->once()->andReturn(true);
 
                 $this->delegate->shouldReceive('process')->once()
                     ->with($this->request)
@@ -103,11 +106,17 @@ describe('AbstractValidationMiddleware', function () {
 
             it('should fail with a DataInvalidException', function () {
 
-                $errors = ['key' => 'error'];
+                $result = Mockery::mock(ValidationResult::class);
 
                 $this->validator->shouldReceive('validate')->once()
                     ->with($this->input)
-                    ->andReturn($errors);
+                    ->andReturn($result);
+
+                $result->shouldReceive('passed')->once()->andReturn(false);
+
+                $result->shouldReceive('getMessages')->once()->andReturn([
+                    'failed',
+                ]);
 
                 expect([$this->middleware, 'process'])->with($this->request, $this->delegate)
                     ->to->throw(DataInvalidException::class);

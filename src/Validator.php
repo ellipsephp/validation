@@ -36,7 +36,7 @@ class Validator
         return new Validator($this->rules, $translator, $this->factories);
     }
 
-    public function validate(array $input = []): array
+    public function validate(array $input = []): ValidationResult
     {
         $errors = [];
 
@@ -53,7 +53,7 @@ class Validator
 
         }
 
-        return array_map([$this->translator, 'translate'], array_values($errors));
+        return new ValidationResult($errors, $this->translator);
     }
 
     private function getFlattenedOutInput(array $input, string $prefix = ''): array
