@@ -31,7 +31,7 @@ class RulesCollection
                 $key = $rule->getKey();
                 $parameters = $e->getParameters();
 
-                $errors[$key . '.' . $name] = new Error($name, $key, $parameters);
+                $errors[$key . '.' . $name] = new ValidationError($name, $key, $parameters);
 
             }
 

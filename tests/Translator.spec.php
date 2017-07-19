@@ -1,7 +1,7 @@
 <?php
 
 use Ellipse\Validation\Translator;
-use Ellipse\Validation\Error;
+use Ellipse\Validation\ValidationError;
 
 describe('Translator', function () {
 
@@ -46,7 +46,7 @@ describe('Translator', function () {
                 'rule' => 'rule - :attribute - :parameter',
             ]);
 
-            $error = new Error('rule', 'key', ['parameter' => 'value']);
+            $error = new ValidationError('rule', 'key', ['parameter' => 'value']);
 
             $test = $translator->translate($error);
 
@@ -64,7 +64,7 @@ describe('Translator', function () {
                 'key' => 'key - :attribute - :parameter',
             ]);
 
-            $error = new Error('rule', 'key', ['parameter' => 'value']);
+            $error = new ValidationError('rule', 'key', ['parameter' => 'value']);
 
             $test = $translator->translate($error);
 
@@ -83,7 +83,7 @@ describe('Translator', function () {
                 'key.rule' => 'key.rule - :attribute - :parameter',
             ]);
 
-            $error = new Error('rule', 'key', ['parameter' => 'value']);
+            $error = new ValidationError('rule', 'key', ['parameter' => 'value']);
 
             $test = $translator->translate($error);
 

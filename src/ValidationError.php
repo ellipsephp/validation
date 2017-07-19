@@ -2,7 +2,7 @@
 
 namespace Ellipse\Validation;
 
-class Error
+class ValidationError
 {
     private $rule;
     private $key;

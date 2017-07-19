@@ -30,7 +30,7 @@ class Translator
         return new Translator($this->labels, $templates);
     }
 
-    public function translate(Error $error): string
+    public function translate(ValidationError $error): string
     {
         // get the errors values.
         $rule = $error->getRule();
