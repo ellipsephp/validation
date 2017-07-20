@@ -6,7 +6,7 @@ use Ellipse\Validation\Exceptions\ValidationException;
 
 class Required
 {
-    public function __invoke(array $fields, string $key)
+    public function __invoke($value, array $fields, string $key)
     {
         if (array_key_exists($key, $fields)) return;
 

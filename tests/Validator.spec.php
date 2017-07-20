@@ -76,7 +76,7 @@ describe('Validator', function () {
         it('should allow to use callable rule', function () {
 
             $input = ['key1' => 'value1', 'key2' => 'value2'];
-            $rules = ['key1' => function ($fields, $key) {
+            $rules = ['key1' => function () {
 
                 throw new ValidationException;
 
@@ -101,12 +101,12 @@ describe('Validator', function () {
             $input = ['key1' => 'value1', 'key2' => 'value2'];
             $rules = [
                 'key1' => [
-                    function ($fields, $key) {
+                    function () {
 
                         throw new ValidationException;
 
                     },
-                    function ($fields, $key) {
+                    function () {
 
                         throw new ValidationException;
 
@@ -133,12 +133,12 @@ describe('Validator', function () {
             $input = ['key1' => 'value1', 'key2' => 'value2'];
             $rules = [
                 'key1' => [
-                    'rule1' => function ($fields, $key) {
+                    'rule1' => function () {
 
                         throw new ValidationException;
 
                     },
-                    'rule2' => function ($fields, $key) {
+                    'rule2' => function () {
 
                         throw new ValidationException;
 
@@ -168,7 +168,7 @@ describe('Validator', function () {
             $rules = ['key1' => 'SomeRule:p1,p2,p3'];
             $factories = ['SomeRule' => function (array $parameters = []) {
 
-                return function ($fields, $key) use ($parameters) {
+                return function () use ($parameters) {
 
                     throw new ValidationException($parameters);
 
@@ -197,7 +197,7 @@ describe('Validator', function () {
             $factories = [
                 'SomeRule' => function (array $parameters = []) {
 
-                    return function ($fields, $key) use ($parameters) {
+                    return function () use ($parameters) {
 
                         throw new ValidationException($parameters);
 
@@ -206,7 +206,7 @@ describe('Validator', function () {
                 },
                 'SomeOtherRule' => function (array $parameters = []) {
 
-                    return function ($fields, $key) use ($parameters) {
+                    return function () use ($parameters) {
 
                         throw new ValidationException($parameters);
 

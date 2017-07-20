@@ -2,7 +2,7 @@
 
 namespace Ellipse\Validation;
 
-class Rule
+class Expectation
 {
     private $key;
     private $assert;
@@ -20,6 +20,8 @@ class Rule
 
     public function assert(array $fields, string $key): void
     {
-        ($this->assert)($fields, $key);
+        $value = $fields[$key] ?? null;
+
+        ($this->assert)($value, $fields, $key);
     }
 }

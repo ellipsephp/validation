@@ -26,9 +26,9 @@ class Min
         return $this->limit;
     }
 
-    public function __invoke(array $fields, string $key)
+    public function __invoke($value)
     {
-        if ($fields[$key] >= $this->limit) return;
+        if ($value >= $this->limit) return;
 
         throw new ValidationException(['min' => $this->limit]);
     }

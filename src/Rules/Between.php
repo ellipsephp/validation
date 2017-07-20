@@ -17,12 +17,12 @@ class Between
         $this->max = new Max($max);
     }
 
-    public function __invoke(array $fields, string $key)
+    public function __invoke($value)
     {
         try {
 
-            ($this->min)($fields, $key);
-            ($this->max)($fields, $key);
+            ($this->min)($value);
+            ($this->max)($value);
 
         }
 

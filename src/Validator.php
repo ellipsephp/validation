@@ -41,13 +41,13 @@ class Validator
         $errors = [];
 
         $input = $this->getFlattenedOutInput($input);
-        $map = $this->getRulesMap($input);
+        $map = $this->getRuleToInputMap($input);
 
         foreach ($map as $input_key => $rule_key) {
 
-            $collection = $this->getRulesCollection($rule_key);
+            $expectations = $this->getExpectationsCollection($rule_key);
 
-            $new_errors = $collection->getErrors($input, $input_key);
+            $new_errors = $expectations->getErrors($input, $input_key);
 
             $errors = array_merge($errors, $new_errors);
 
@@ -72,7 +72,7 @@ class Validator
         }, []);
     }
 
-    private function getRulesMap(array $input): array
+    private function getRuleToInputMap(array $input): array
     {
         $rules_keys = array_keys($this->rules);
         $input_keys = array_keys($input);
@@ -101,7 +101,7 @@ class Validator
         throw new \Exception('Rule factory not defined');
     }
 
-    private function getRulesCollection(string $rule_key): RulesCollection
+    private function getExpectationsCollection(string $rule_key): ExpectationsCollection
     {
         $definitions = $this->rules[$rule_key];
 
@@ -119,14 +119,14 @@ class Validator
 
         if (is_array($definitions)) {
 
-            return $this->parseRulesArray($rule_key, $definitions);
+            return $this->parseDefinitionsArray($rule_key, $definitions);
 
         }
 
         throw new \Exception('Invalid rules format 2');
     }
 
-    private function parseRulesArray(string $rule_key, array $definitions): RulesCollection
+    private function parseDefinitionsArray(string $rule_key, array $definitions): ExpectationsCollection
     {
         $keys = array_keys($definitions);
 
@@ -136,29 +136,29 @@ class Validator
 
             if (is_callable($definition)) {
 
-                $name = $key;
+                $rule_name = $key;
                 $assert = $definition;
 
             }
 
             if (is_string($definition)) {
 
-                [$name, $parameters] = explode(':', $definition);
+                [$rule_name, $parameters] = explode(':', $definition);
                 $parameters = explode(',', $parameters);
 
-                $name = trim($name);
+                $rule_name = trim($rule_name);
                 $parameters = array_map('trim', $parameters);
 
-                $factory = $this->getRuleFactory($name);
+                $factory = $this->getRuleFactory($rule_name);
 
                 $assert = $factory($parameters);
 
             }
 
-            return array_merge($rules, [$name => new Rule($rule_key, $assert)]);
+            return array_merge($rules, [$rule_name => new Expectation($rule_key, $assert)]);
 
         }, []);
 
-        return new RulesCollection($rules);
+        return new ExpectationsCollection($rules);
     }
 }
