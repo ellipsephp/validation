@@ -90,58 +90,6 @@ class Validator
         }, []);
     }
 
-    private function getRulesCollection(string $key): RulesCollection
-    {
-        $definition = $this->rules[$key];
-
-        if (is_string($definition)) {
-
-            $definition = array_map('trim', explode('|', $definition));
-
-        }
-
-        if (is_callable($definition)) {
-
-            $definition = [$definition];
-
-        }
-
-        if (is_array($definition)) {
-
-            $rules = array_map(function ($definition) use ($key) {
-
-                return $this->getRule($key, $definition);
-
-            }, $definition);
-
-            return new RulesCollection($rules);
-
-        }
-
-        throw new \Exception('Invalid rules format');
-    }
-
-    private function getRule(string $key, $definition): Rule
-    {
-        if (is_callable($definition)) {
-
-            return new Rule($key, $definition);
-
-        }
-
-        [$name, $parameters] = explode(':', $definition);
-        $parameters = explode(',', $parameters);
-
-        $name = trim($name);
-        $parameters = array_map('trim', $parameters);
-
-        $factory = $this->getRuleFactory($name);
-
-        $assert = $factory($parameters);
-
-        return new NamedRule($name, $key, $assert);
-    }
-
     private function getRuleFactory(string $name): callable
     {
         if (array_key_exists($name, $this->factories)) {
@@ -151,5 +99,66 @@ class Validator
         }
 
         throw new \Exception('Rule factory not defined');
+    }
+
+    private function getRulesCollection(string $rule_key): RulesCollection
+    {
+        $definitions = $this->rules[$rule_key];
+
+        if (is_callable($definitions)) {
+
+            $definitions = [$definitions];
+
+        }
+
+        if (is_string($definitions)) {
+
+            $definitions = array_map('trim', explode('|', $definitions));
+
+        }
+
+        if (is_array($definitions)) {
+
+            return $this->parseRulesArray($rule_key, $definitions);
+
+        }
+
+        throw new \Exception('Invalid rules format 2');
+    }
+
+    private function parseRulesArray(string $rule_key, array $definitions): RulesCollection
+    {
+        $keys = array_keys($definitions);
+
+        $rules = array_reduce($keys, function ($rules, $key) use ($rule_key, $definitions) {
+
+            $definition = $definitions[$key];
+
+            if (is_callable($definition)) {
+
+                $name = $key;
+                $assert = $definition;
+
+            }
+
+            if (is_string($definition)) {
+
+                [$name, $parameters] = explode(':', $definition);
+                $parameters = explode(',', $parameters);
+
+                $name = trim($name);
+                $parameters = array_map('trim', $parameters);
+
+                $factory = $this->getRuleFactory($name);
+
+                $assert = $factory($parameters);
+
+            }
+
+            return array_merge($rules, [$name => new Rule($rule_key, $assert)]);
+
+        }, []);
+
+        return new RulesCollection($rules);
     }
 }

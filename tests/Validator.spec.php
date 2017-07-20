@@ -96,7 +96,7 @@ describe('Validator', function () {
 
         });
 
-        it('should allow to use multiple callable rules', function () {
+        it('should allow to use multiple anonymous callable rules', function () {
 
             $input = ['key1' => 'value1', 'key2' => 'value2'];
             $rules = [
@@ -128,7 +128,41 @@ describe('Validator', function () {
 
         });
 
-        it('should allow to use named rule factory', function () {
+        it('should allow to use multiple named callable rules', function () {
+
+            $input = ['key1' => 'value1', 'key2' => 'value2'];
+            $rules = [
+                'key1' => [
+                    'rule1' => function ($fields, $key) {
+
+                        throw new ValidationException;
+
+                    },
+                    'rule2' => function ($fields, $key) {
+
+                        throw new ValidationException;
+
+                    }
+                ],
+            ];
+
+            $validator = new Validator($rules, new Translator);
+
+            $validator = $validator->withLabels(['key1' => 'the key']);
+            $validator = $validator->withTemplates(['key1.rule1' => ':attribute failed 1']);
+            $validator = $validator->withTemplates(['key1.rule2' => ':attribute failed 2']);
+
+            $test = $validator->validate($input);
+
+            expect($test)->to->be->an->instanceof(ValidationResult::class);
+            expect($test->passed())->to->be->false();
+            expect($test->getMessages())->to->have->length(2);
+            expect($test->getMessages()[0])->to->be->equal('the key failed 1');
+            expect($test->getMessages()[1])->to->be->equal('the key failed 2');
+
+        });
+
+        it('should allow to use a rule factory string', function () {
 
             $input = ['key1' => 'value1', 'key2' => 'value2'];
             $rules = ['key1' => 'SomeRule:p1,p2,p3'];
@@ -156,7 +190,7 @@ describe('Validator', function () {
 
         });
 
-        it('should allow to use multiple named rule factory', function () {
+        it('should allow to use multiple rule factory strings', function () {
 
             $input = ['key1' => 'value1', 'key2' => 'value2'];
             $rules = ['key1' => 'SomeRule:p1,p2,p3|SomeOtherRule:p4,p5,p6'];

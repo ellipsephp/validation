@@ -17,7 +17,7 @@ class RulesCollection
     {
         $errors = [];
 
-        foreach ($this->rules as $rule) {
+        foreach ($this->rules as $name => $rule) {
 
             try {
 
@@ -27,7 +27,7 @@ class RulesCollection
 
             catch (ValidationException $e) {
 
-                $name = $rule instanceof NamedRule ? $rule->getName() : $rule->getKey();
+                $name = is_string($name) ? $name : $rule->getKey();
                 $key = $rule->getKey();
                 $parameters = $e->getParameters();
 

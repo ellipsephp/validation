@@ -62,7 +62,7 @@ class Translator
 
     private function getTranslatedValue($label): string
     {
-        return $this->labels[$label] ?? $label;
+        return (string) ($this->labels[$label] ?? $label);
     }
 
     private function getMessageTemplate(string $key, string $rule): ?string
@@ -87,7 +87,7 @@ class Translator
 
         }
 
-        if (array_key_exists(self::DEFAULT_TEMPLATE_KEY, $this->message)) {
+        if (array_key_exists(self::DEFAULT_TEMPLATE_KEY, $this->templates)) {
 
             return $this->templates[$rule];
 
