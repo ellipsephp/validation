@@ -2,8 +2,6 @@
 
 namespace Ellipse\Validation;
 
-use Ellipse\Validation\Exceptions\ValidationException;
-
 class Validator
 {
     private $rules;
