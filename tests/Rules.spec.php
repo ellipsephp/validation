@@ -1,7 +1,5 @@
 <?php
 
-use InvalidArgumentException;
-
 use Psr\Http\Message\UploadedFileInterface;
 
 use Ellipse\Validation\Rules;
