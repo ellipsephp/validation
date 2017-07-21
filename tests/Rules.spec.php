@@ -898,3 +898,73 @@ describe('NotInRule', function () {
     });
 
 });
+
+describe('AcceptedRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\AcceptedRule;
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is either yes, on, 1 or true', function () {
+
+            expect($this->rule)->with('yes')->to->not->throw(ValidationException::class);
+            expect($this->rule)->with('on')->to->not->throw(ValidationException::class);
+            expect($this->rule)->with(1)->to->not->throw(ValidationException::class);
+            expect($this->rule)->with(true)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not either yes, on, 1 or true', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('NotAcceptedRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\NotAcceptedRule;
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is not either yes, on, 1 or true', function () {
+
+            expect($this->rule)->with('value')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is either yes, on, 1 or true', function () {
+
+            expect($this->rule)->with('yes')->to->throw(ValidationException::class);
+            expect($this->rule)->with('on')->to->throw(ValidationException::class);
+            expect($this->rule)->with(1)->to->throw(ValidationException::class);
+            expect($this->rule)->with(true)->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});

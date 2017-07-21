@@ -8,6 +8,7 @@ class ValidatorFactory
     private $translator;
 
     private static $defaults = [
+        Rules\AcceptedRule::class,
         Rules\AlphaNumRule::class,
         Rules\AlphaRule::class,
         Rules\ArrayRule::class,
@@ -20,6 +21,7 @@ class ValidatorFactory
         Rules\IpRule::class,
         Rules\MaxRule::class,
         Rules\MinRule::class,
+        Rules\NotAcceptedRule::class,
         Rules\NotBlankRule::class,
         Rules\NotInRule::class,
         Rules\NumericRule::class,
