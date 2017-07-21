@@ -1,5 +1,7 @@
 <?php
 
+use InvalidArgumentException;
+
 use Psr\Http\Message\UploadedFileInterface;
 
 use Ellipse\Validation\Rules;
@@ -379,6 +381,381 @@ describe('SlugRule', function () {
 
             expect($this->rule)->with('value1 value2')->to->throw(ValidationException::class);
             expect($this->rule)->with('va#lue')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('MinRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\MinRule(10);
+
+    });
+
+    it('should fail when the limit is not numeric', function () {
+
+        $factory = function ($limit) { return new Rules\MinRule($limit); };
+
+        expect($factory)->with('limit')->to->throw(InvalidArgumentException::class);
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a string, an array or a countable object', function () {
+
+            expect($this->rule)->with(function () {})->to->throw(InvalidArgumentException::class);
+
+        });
+
+        context('when the value is a numeric', function () {
+
+            it('should not fail when the numeric value is greater or equal than the limit', function () {
+
+                expect($this->rule)->with(10)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with(11)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with(10.1)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('10')->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('11')->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('10.1')->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the string length is lesser than the limit', function () {
+
+                expect($this->rule)->with(9)->to->throw(ValidationException::class);
+                expect($this->rule)->with(9.9)->to->throw(ValidationException::class);
+                expect($this->rule)->with('9')->to->throw(ValidationException::class);
+                expect($this->rule)->with('9.9')->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+        context('when the value is a string', function () {
+
+            it('should not fail when the string length is greater or equal than the limit', function () {
+
+                expect($this->rule)->with('valuevalue')->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('valuevaluev')->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the string length is lesser than the limit', function () {
+
+                expect($this->rule)->with('valuevalu')->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+        context('when the value is an array', function () {
+
+            it('should not fail when the array size is greater or equal than the limit', function () {
+
+                $value1 = array_pad([], 10, 'value');
+                $value2 = array_pad([], 11, 'value');
+
+                expect($this->rule)->with($value1)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with($value2)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the array size is lesser than the limit', function () {
+
+                $value = array_pad([], 9, 'value');
+
+                expect($this->rule)->with($value)->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+        context('when the value is a countable object', function () {
+
+            it('should not fail when the countable size is greater or equal than the limit', function () {
+
+                $value1 = new ArrayObject(array_pad([], 10, 'value'));
+                $value2 = new ArrayObject(array_pad([], 11, 'value'));
+
+                expect($this->rule)->with($value1)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with($value2)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the countable size is lesser than the limit', function () {
+
+                $value = new ArrayObject(array_pad([], 9, 'value'));
+
+                expect($this->rule)->with($value)->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+    });
+
+});
+
+describe('MaxRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\MaxRule(10);
+
+    });
+
+    it('should fail when the limit is not numeric', function () {
+
+        $factory = function ($limit) { return new Rules\MaxRule($limit); };
+
+        expect($factory)->with('limit')->to->throw(InvalidArgumentException::class);
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a string, an array or a countable object', function () {
+
+            expect($this->rule)->with(function () {})->to->throw(InvalidArgumentException::class);
+
+        });
+
+        context('when the value is a numeric', function () {
+
+            it('should not fail when the numeric value is lesser or equal than the limit', function () {
+
+                expect($this->rule)->with(9)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with(10)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with(9.9)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('9')->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('10')->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('9.9')->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the string length is greater than the limit', function () {
+
+                expect($this->rule)->with(11)->to->throw(ValidationException::class);
+                expect($this->rule)->with(10.1)->to->throw(ValidationException::class);
+                expect($this->rule)->with('11')->to->throw(ValidationException::class);
+                expect($this->rule)->with('10.1')->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+
+        context('when the value is a string', function () {
+
+            it('should not fail when the string length is lesser or equal than the limit', function () {
+
+                expect($this->rule)->with('valuevalu')->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('valuevalue')->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the string length is greatee than the limit', function () {
+
+                expect($this->rule)->with('valuevaluev')->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+        context('when the value is an array', function () {
+
+            it('should not fail when the array size is lesser or equal than the limit', function () {
+
+                $value1 = array_pad([], 9, 'value');
+                $value2 = array_pad([], 10, 'value');
+
+                expect($this->rule)->with($value1)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with($value2)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the array size is greater than the limit', function () {
+
+                $value = array_pad([], 11, 'value');
+
+                expect($this->rule)->with($value)->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+        context('when the value is a countable object', function () {
+
+            it('should not fail when the countable size is lesser or equal than the limit', function () {
+
+                $value1 = new ArrayObject(array_pad([], 9, 'value'));
+                $value2 = new ArrayObject(array_pad([], 10, 'value'));
+
+                expect($this->rule)->with($value1)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with($value2)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the countable size is greater than the limit', function () {
+
+                $value = new ArrayObject(array_pad([], 11, 'value'));
+
+                expect($this->rule)->with($value)->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+    });
+
+});
+
+describe('BetweenRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\BetweenRule(5, 10);
+
+    });
+
+    it('should fail when the min limit is not numeric', function () {
+
+        $factory = function ($min, $max) { return new Rules\BetweenRule($min, $max); };
+
+        expect($factory)->with('limit', 10)->to->throw(InvalidArgumentException::class);
+
+    });
+
+    it('should fail when the max limit is not numeric', function () {
+
+        $factory = function ($min, $max) { return new Rules\BetweenRule($min, $max); };
+
+        expect($factory)->with(10, 'limit')->to->throw(InvalidArgumentException::class);
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should fail when the value is not a string, an array or a countable object', function () {
+
+            expect($this->rule)->with(function () {})->to->throw(InvalidArgumentException::class);
+
+        });
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        context('when the value is a numeric', function () {
+
+            it('should not fail when the string length is between the limits', function () {
+
+                expect($this->rule)->with(5)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with(10)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with(5.1)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with(9.9)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('5')->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('10')->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('5.1')->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('9.9')->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the string length is not between the limits', function () {
+
+                expect($this->rule)->with(4)->to->throw(ValidationException::class);
+                expect($this->rule)->with(11)->to->throw(ValidationException::class);
+                expect($this->rule)->with(4.9)->to->throw(ValidationException::class);
+                expect($this->rule)->with(10.1)->to->throw(ValidationException::class);
+                expect($this->rule)->with('4')->to->throw(ValidationException::class);
+                expect($this->rule)->with('11')->to->throw(ValidationException::class);
+                expect($this->rule)->with('4.9')->to->throw(ValidationException::class);
+                expect($this->rule)->with('10.1')->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+        context('when the value is a string', function () {
+
+            it('should not fail when the string length is between the limits', function () {
+
+                expect($this->rule)->with('value')->to->not->throw(ValidationException::class);
+                expect($this->rule)->with('valuevalue')->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the string length is not between the limits', function () {
+
+                expect($this->rule)->with('valu')->to->throw(ValidationException::class);
+                expect($this->rule)->with('valuevaluev')->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+        context('when the value is an array', function () {
+
+            it('should not fail when the array size is between the limits', function () {
+
+                $value1 = array_pad([], 5, 'value');
+                $value2 = array_pad([], 10, 'value');
+
+                expect($this->rule)->with($value1)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with($value2)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the array size is not between the limits', function () {
+
+                $value = array_pad([], 4, 'value');
+                $value = array_pad([], 11, 'value');
+
+                expect($this->rule)->with($value)->to->throw(ValidationException::class);
+
+            });
+
+        });
+
+        context('when the value is a countable object', function () {
+
+            it('should not fail when the countable size is between the limits', function () {
+
+                $value1 = new ArrayObject(array_pad([], 5, 'value'));
+                $value2 = new ArrayObject(array_pad([], 10, 'value'));
+
+                expect($this->rule)->with($value1)->to->not->throw(ValidationException::class);
+                expect($this->rule)->with($value2)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the countable size is not between the limits', function () {
+
+                $value = new ArrayObject(array_pad([], 4, 'value'));
+                $value = new ArrayObject(array_pad([], 11, 'value'));
+
+                expect($this->rule)->with($value)->to->throw(ValidationException::class);
+
+            });
 
         });
 

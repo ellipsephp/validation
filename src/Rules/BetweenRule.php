@@ -2,19 +2,17 @@
 
 namespace Ellipse\Validation\Rules;
 
-use \InvalidArgumentException;
-
 use Ellipse\Validation\Exceptions\ValidationException;
 
-class Between
+class BetweenRule
 {
     private $min;
     private $max;
 
     public function __construct($min, $max)
     {
-        $this->min = new Min($min);
-        $this->max = new Max($max);
+        $this->min = new MinRule($min);
+        $this->max = new MaxRule($max);
     }
 
     public function __invoke($value)
