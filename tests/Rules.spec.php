@@ -142,6 +142,39 @@ describe('ArrayRule', function () {
 
 });
 
+describe('BooleanRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\BooleanRule;
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is an boolean', function () {
+
+            expect($this->rule)->with(true)->to->not->throw(ValidationException::class);
+            expect($this->rule)->with(false)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a boolean', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
 describe('NumericRule', function () {
 
     beforeEach(function () {

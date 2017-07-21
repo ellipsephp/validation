@@ -13,6 +13,7 @@ class ValidatorFactory
         Rules\AlphaRule::class,
         Rules\ArrayRule::class,
         Rules\BetweenRule::class,
+        Rules\BooleanRule::class,
         Rules\DifferentRule::class,
         Rules\EmailRule::class,
         Rules\EqualsRule::class,
