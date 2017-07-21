@@ -8,10 +8,18 @@ class ValidatorFactory
     private $translator;
 
     private static $defaults = [
-        Rules\Required::class => 'The field :field is required.',
-        Rules\Min::class => 'The :field value must be greater than :min.',
-        Rules\Max::class => 'The :field value must be lesser than :max.',
-        Rules\Between::class => 'The :field value must be greater than :min and lesser than :max.',
+        Rules\AlphaNumRule::class,
+        Rules\AlphaRule::class,
+        Rules\ArrayRule::class,
+        Rules\DifferentRule::class,
+        Rules\EmailRule::class,
+        Rules\EqualsRule::class,
+        Rules\IntegerRule::class,
+        Rules\IpRule::class,
+        Rules\NotBlankRule::class,
+        Rules\NumericRule::class,
+        Rules\PresentRule::class,
+        Rules\SlugRule::class,
     ];
 
     /**
@@ -37,9 +45,7 @@ class ValidatorFactory
 
     private function withBuiltInFactories(): ValidatorFactory
     {
-        $rules = array_keys(self::$defaults);
-
-        return array_reduce($rules, function ($factory, $rule) {
+        return array_reduce(self::$defaults, function ($factory, $rule) {
 
             $name = self::getNameFromRuleClass($rule);
 
@@ -54,16 +60,7 @@ class ValidatorFactory
 
     private function withBuiltInTemplates(): ValidatorFactory
     {
-        $rules = array_keys(self::$defaults);
-
-        return array_reduce($rules, function ($factory, $rule) {
-
-            $name = self::getNameFromRuleClass($rule);
-            $template = self::$defaults[$rule];
-
-            return $factory->withDefaultTemplates([$name => $template]);
-
-        }, $this);
+        return $this;
     }
 
     public function __construct(array $factories = [], Translator $translator)

@@ -4,11 +4,13 @@ namespace Ellipse\Validation\Rules;
 
 use Ellipse\Validation\Exceptions\ValidationException;
 
-class Required
+class IpRule
 {
-    public function __invoke($value, array $fields, string $key)
+    public function __invoke($value)
     {
-        if (array_key_exists($key, $fields)) return;
+        if (is_null($value)) return;
+
+        if (filter_var($value, FILTER_VALIDATE_IP) !== false) return;
 
         throw new ValidationException;
     }
