@@ -74,7 +74,7 @@ class ValidatorFactory
 
     public function getValidator(array $rules = []): Validator
     {
-        return new Validator($rules, $this->translator, $this->factories);
+        return Validator::create($rules, $this->factories, $this->translator);
     }
 
     public function withRuleFactory(string $name, callable $factory): ValidatorFactory

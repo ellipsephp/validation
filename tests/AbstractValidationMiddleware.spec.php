@@ -40,7 +40,7 @@ describe('AbstractValidationMiddleware', function () {
 
     });
 
-    describe('->process', function () {
+    describe('->process()', function () {
 
         beforeEach(function () {
 

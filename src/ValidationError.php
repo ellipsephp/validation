@@ -4,25 +4,25 @@ namespace Ellipse\Validation;
 
 class ValidationError
 {
-    private $rule;
     private $key;
+    private $rule;
     private $parameters;
 
-    public function __construct(string $rule, string $key, array $parameters)
+    public function __construct(string $key, string $rule, array $parameters)
     {
-        $this->rule = $rule;
         $this->key = $key;
+        $this->rule = $rule;
         $this->parameters = $parameters;
-    }
-
-    public function getRule(): string
-    {
-        return $this->rule;
     }
 
     public function getKey(): string
     {
         return $this->key;
+    }
+
+    public function getRule(): string
+    {
+        return $this->rule;
     }
 
     public function getParameters(): array

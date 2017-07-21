@@ -25,6 +25,6 @@ class ValidationResult
 
     public function getMessages(): array
     {
-        return array_map([$this->translator, 'translate'], array_values($this->errors));
+        return array_map([$this->translator, 'translate'], $this->errors);
     }
 }
