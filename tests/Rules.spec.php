@@ -834,3 +834,67 @@ describe('DifferentRule', function () {
     });
 
 });
+
+describe('InRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\InRule(['value1', 'value2']);
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is contained in the set', function () {
+
+            expect($this->rule)->with('value1')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not contained in the set', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('NotInRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\NotInRule(['value1', 'value2']);
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is not contained in the set', function () {
+
+            expect($this->rule)->with('value')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is contained in the set', function () {
+
+            expect($this->rule)->with('value1')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
