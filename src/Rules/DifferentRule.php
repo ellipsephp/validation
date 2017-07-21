@@ -15,6 +15,8 @@ class DifferentRule
 
     public function __invoke($value, string $key, array $scope)
     {
+        if (is_null($value)) return;
+
         if ($value !== $scope[$this->other] ?? null) return;
 
         throw new ValidationException(['other' => $this->other]);
