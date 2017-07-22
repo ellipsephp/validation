@@ -706,12 +706,66 @@ describe('DateBetweenRule', function () {
 
 });
 
+describe('BirthdayRule', function () {
+
+    beforeEach(function () {
+
+        $this->factory = function ($age) { return new Rules\BirthdayRule($age); };
+        $this->rule = new Rules\BirthdayRule('18');
+
+    });
+
+    it('should fail when either the age is not a positive integer', function () {
+
+        expect($this->factory)->with('limit')->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with('0')->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with('-1')->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with('1.1')->to->throw(InvalidArgumentException::class);
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the birthday is before the limit', function () {
+
+            $birthday1 = date('Y-m-d', strtotime('-18 YEARS'));
+            $birthday2 = date('Y-m-d', strtotime('-19 YEARS'));
+
+            expect($this->rule)->with($birthday1)->to->not->throw(ValidationException::class);
+            expect($this->rule)->with($birthday2)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a string representation of a date', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not between the limits', function () {
+
+            $birthday = date('Y-m-d', strtotime('-17 YEARS'));
+
+            expect($this->rule)->with($birthday)->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
 describe('MinRule', function () {
 
     beforeEach(function () {
 
         $this->factory = function ($limit) { return new Rules\MinRule($limit); };
-        $this->rule = new Rules\MinRule(10);
+        $this->rule = new Rules\MinRule('10');
 
     });
 
@@ -829,7 +883,7 @@ describe('MaxRule', function () {
     beforeEach(function () {
 
         $this->factory = function ($limit) { return new Rules\MaxRule($limit); };
-        $this->rule = new Rules\MaxRule(10);
+        $this->rule = new Rules\MaxRule('10');
 
     });
 
@@ -948,7 +1002,7 @@ describe('BetweenRule', function () {
     beforeEach(function () {
 
         $this->factory = function ($min, $max) { return new Rules\BetweenRule($min, $max); };
-        $this->rule = new Rules\BetweenRule(5, 10);
+        $this->rule = new Rules\BetweenRule('5', '10');
 
     });
 

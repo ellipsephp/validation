@@ -43,7 +43,7 @@ class BetweenRule
             $min = $this->min->getLimit();
             $max = $this->max->getLimit();
 
-            throw new ValidationException(['min' => $min, 'max' => $max]);
+            throw new ValidationException(['min' => (string) $min, 'max' => (string) $max]);
 
         }
     }

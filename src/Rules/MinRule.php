@@ -30,7 +30,7 @@ class MinRule
 
             if ($value + 0 >= $this->limit) return;
 
-            throw new ValidationException(['min' => $this->limit]);
+            throw new ValidationException(['min' => (string) $this->limit]);
 
         }
 
@@ -38,7 +38,7 @@ class MinRule
 
             if (strlen($value) >= $this->limit) return;
 
-            throw new ValidationException(['min' => $this->limit]);
+            throw new ValidationException(['min' => (string) $this->limit]);
 
         }
 
@@ -46,7 +46,7 @@ class MinRule
 
             if (count($value) >= $this->limit) return;
 
-            throw new ValidationException(['min' => $this->limit]);
+            throw new ValidationException(['min' => (string) $this->limit]);
 
         }
 

@@ -30,7 +30,7 @@ class MaxRule
 
             if ($value + 0 <= $this->limit) return;
 
-            throw new ValidationException(['max' => $this->limit]);
+            throw new ValidationException(['max' => (string) $this->limit]);
 
         }
 
@@ -38,7 +38,7 @@ class MaxRule
 
             if (strlen($value) <= $this->limit) return;
 
-            throw new ValidationException(['max' => $this->limit]);
+            throw new ValidationException(['max' => (string) $this->limit]);
 
         }
 
@@ -46,7 +46,7 @@ class MaxRule
 
             if (count($value) <= $this->limit) return;
 
-            throw new ValidationException(['max' => $this->limit]);
+            throw new ValidationException(['max' => (string) $this->limit]);
 
         }
 

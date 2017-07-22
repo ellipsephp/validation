@@ -10,7 +10,7 @@ class NotAcceptedRule
 
     public function __construct()
     {
-        $this->not_in = new NotInRule('yes', 'on', 1, true);
+        $this->not_in = new NotInRule('yes', 'on', '1', 1, true);
     }
 
     public function __invoke($value)

@@ -10,7 +10,7 @@ class AcceptedRule
 
     public function __construct()
     {
-        $this->in = new InRule('yes', 'on', 1, true);
+        $this->in = new InRule('yes', 'on', '1', 1, true);
     }
 
     public function __invoke($value)
