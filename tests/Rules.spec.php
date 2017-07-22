@@ -1161,7 +1161,7 @@ describe('InRule', function () {
 
     beforeEach(function () {
 
-        $this->rule = new Rules\InRule(['value1', 'value2']);
+        $this->rule = new Rules\InRule('value1', 'value2');
 
     });
 
@@ -1193,7 +1193,7 @@ describe('NotInRule', function () {
 
     beforeEach(function () {
 
-        $this->rule = new Rules\NotInRule(['value1', 'value2']);
+        $this->rule = new Rules\NotInRule('value1', 'value2');
 
     });
 

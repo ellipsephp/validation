@@ -8,7 +8,7 @@ class InRule
 {
     private $set;
 
-    public function __construct($set)
+    public function __construct(...$set)
     {
         $this->set = $set;
     }
