@@ -8,36 +8,36 @@ class ValidatorFactory
     private $translator;
 
     private static $defaults = [
-        Rules\AcceptedRule::class,
-        Rules\AlphaNumRule::class,
-        Rules\AlphaRule::class,
-        Rules\ArrayRule::class,
-        Rules\BetweenRule::class,
-        Rules\BirthdayRule::class,
-        Rules\BooleanRule::class,
-        Rules\DateAfterRule::class,
-        Rules\DateBeforeRule::class,
-        Rules\DateBetweenRule::class,
-        Rules\DateFormatRule::class,
-        Rules\DateRule::class,
-        Rules\DifferentRule::class,
-        Rules\EmailRule::class,
-        Rules\EqualsRule::class,
-        Rules\HaveDifferentRule::class,
-        Rules\HaveSameRule::class,
-        Rules\InRule::class,
-        Rules\IntegerRule::class,
-        Rules\IpRule::class,
-        Rules\MaxRule::class,
-        Rules\MinRule::class,
-        Rules\NotAcceptedRule::class,
-        Rules\NotBlankRule::class,
-        Rules\NotInRule::class,
-        Rules\NumericRule::class,
-        Rules\PresentRule::class,
-        Rules\SlugRule::class,
-        Rules\UrlActiveRule::class,
-        Rules\UrlRule::class,
+        'accepted'      => Rules\AcceptedRule::class,
+        'alphanum'      => Rules\AlphaNumRule::class,
+        'alpha'         => Rules\AlphaRule::class,
+        'array'         => Rules\ArrayRule::class,
+        'between'       => Rules\BetweenRule::class,
+        'birthday'      => Rules\BirthdayRule::class,
+        'boolean'       => Rules\BooleanRule::class,
+        'dateafter'     => Rules\DateAfterRule::class,
+        'datebefore'    => Rules\DateBeforeRule::class,
+        'datebetween'   => Rules\DateBetweenRule::class,
+        'dateformat'    => Rules\DateFormatRule::class,
+        'date'          => Rules\DateRule::class,
+        'different'     => Rules\DifferentRule::class,
+        'email'         => Rules\EmailRule::class,
+        'equals'        => Rules\EqualsRule::class,
+        'havedifferent' => Rules\HaveDifferentRule::class,
+        'havesame'      => Rules\HaveSameRule::class,
+        'in'            => Rules\InRule::class,
+        'integer'       => Rules\IntegerRule::class,
+        'ip'            => Rules\IpRule::class,
+        'max'           => Rules\MaxRule::class,
+        'min'           => Rules\MinRule::class,
+        'notaccepted'   => Rules\NotAcceptedRule::class,
+        'notblank'      => Rules\NotBlankRule::class,
+        'notin'         => Rules\NotInRule::class,
+        'numeric'       => Rules\NumericRule::class,
+        'present'       => Rules\PresentRule::class,
+        'slug'          => Rules\SlugRule::class,
+        'urlactive'     => Rules\UrlActiveRule::class,
+        'url'           => Rules\UrlRule::class,
     ];
 
     /**
@@ -45,29 +45,24 @@ class ValidatorFactory
      *
      * @return \Ellipse\Validator\ValidatorFactory
      */
-    public static function create(): ValidatorFactory
+    public static function create(string $locale = 'en'): ValidatorFactory
     {
         $factory = new ValidatorFactory([], new Translator);
         $factory = $factory->withBuiltInFactories();
-        $factory = $factory->withBuiltInTemplates();
+        $factory = $factory->withBuiltInTemplates($locale);
 
         return $factory;
     }
 
-    private static function getNameFromRuleClass(string $class): string
-    {
-        $parts = explode('\\', $class);
-
-        return strtolower(end($parts));
-    }
-
     private function withBuiltInFactories(): ValidatorFactory
     {
-        return array_reduce(self::$defaults, function ($factory, $rule) {
+        $keys = array_keys(self::$defaults);
 
-            $name = self::getNameFromRuleClass($rule);
+        return array_reduce($keys, function ($factory, $key) {
 
-            return $factory->withRuleFactory($name, function (array $parameters = []) use ($rule) {
+            $rule = self::$defaults[$key];
+
+            return $factory->withRuleFactory($key, function (array $parameters = []) use ($rule) {
 
                 return new $rule(...$parameters);
 
@@ -76,9 +71,11 @@ class ValidatorFactory
         }, $this);
     }
 
-    private function withBuiltInTemplates(): ValidatorFactory
+    private function withBuiltInTemplates(string $locale): ValidatorFactory
     {
-        return $this;
+        $templates = include(__DIR__ . '/../lang/' . $locale . '.php');
+
+        return $this->withDefaultTemplates($templates);
     }
 
     public function __construct(array $factories = [], Translator $translator)

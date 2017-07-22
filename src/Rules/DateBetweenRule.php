@@ -8,17 +8,17 @@ use Ellipse\Validation\Exceptions\ValidationException;
 
 class DateBetweenRule
 {
-    private $after;
-    private $before;
+    private $min;
+    private $max;
 
-    public function __construct(string $after, string $before)
+    public function __construct(string $min, string $max)
     {
-        $this->after = new DateAfterRule($after);
-        $this->before = new DateBeforeRule($before);
+        $this->min = new DateAfterRule($min);
+        $this->max = new DateBeforeRule($max);
 
         try {
 
-            ($this->after)($before);
+            ($this->min)($max);
 
         }
 
@@ -33,17 +33,17 @@ class DateBetweenRule
     {
         try {
 
-            ($this->after)($value);
-            ($this->before)($value);
+            ($this->min)($value);
+            ($this->max)($value);
 
         }
 
         catch (ValidationException $e) {
 
-            $after = $this->after->getLimit();
-            $before = $this->before->getLimit();
+            $min = $this->min->getLimit();
+            $max = $this->max->getLimit();
 
-            throw new ValidationException(['after' => $after, 'before' => $before]);
+            throw new ValidationException(['min' => $min, 'max' => $max]);
 
         }
     }

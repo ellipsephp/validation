@@ -59,12 +59,6 @@ class RulesParser
 
     private function parseRuleDefinition($key, $definition): array
     {
-        if (is_callable($definition)) {
-
-            return [$key => new Rule($definition)];
-
-        }
-
         if (is_string($definition)) {
 
             $parts = explode(':', $definition);
@@ -84,6 +78,14 @@ class RulesParser
             $assert = $factory($parameters);
 
             return [$name => new Rule($assert)];
+
+        }
+
+        // is_callable must be AFTER is string, otherwise factories named like a
+        // a php function cant be used (ex: date).
+        if (is_callable($definition)) {
+
+            return [$key => new Rule($definition)];
 
         }
 

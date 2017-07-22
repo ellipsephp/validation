@@ -53,6 +53,14 @@ describe('Rule', function () {
 
         });
 
+        it('should call the rule with * as a value when the key is *', function () {
+
+            $rule = $this->rule('*', '*', $this->scope, $this->input);
+
+            $rule->validate('*', $this->scope, $this->input);
+
+        });
+
     });
 
 });

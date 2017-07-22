@@ -13,7 +13,7 @@ class Rule
 
     public function validate(string $key, array $scope = [], array $input = []): void
     {
-        $value = $scope[$key] ?? null;
+        $value = $key == '*' ? '*' : $scope[$key] ?? null;
 
         ($this->validate)($value, $key, $scope, $input);
     }

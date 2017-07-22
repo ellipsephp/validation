@@ -1370,7 +1370,7 @@ describe('HaveDifferentRule', function () {
                 [],
             ];
 
-            expect($this->rule)->with('*', $scope)->to->not->throw(ValidationException::class);
+            expect($this->rule)->with('*', '*', $scope)->to->not->throw(ValidationException::class);
 
         });
 
@@ -1383,7 +1383,7 @@ describe('HaveDifferentRule', function () {
                 [],
             ];
 
-            expect($this->rule)->with('*', $scope)->to->throw(ValidationException::class);
+            expect($this->rule)->with('*', '*', $scope)->to->throw(ValidationException::class);
 
         });
 
@@ -1416,7 +1416,7 @@ describe('HaveSameRule', function () {
                 [],
             ];
 
-            expect($this->rule)->with('*', $scope)->to->not->throw(ValidationException::class);
+            expect($this->rule)->with('*', '*', $scope)->to->not->throw(ValidationException::class);
 
         });
 
@@ -1429,7 +1429,7 @@ describe('HaveSameRule', function () {
                 [],
             ];
 
-            expect($this->rule)->with('*', $scope)->to->throw(ValidationException::class);
+            expect($this->rule)->with('*', '*', $scope)->to->throw(ValidationException::class);
 
         });
 

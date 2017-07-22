@@ -15,7 +15,7 @@ class HaveDifferentRule
         $this->field = $field;
     }
 
-    public function __invoke($value, array $scope)
+    public function __invoke($value, string $key, array $scope)
     {
         if ($value !== '*') {
 
