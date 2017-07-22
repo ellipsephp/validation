@@ -101,7 +101,7 @@ describe('ValidatorFactory', function () {
 
     });
 
-    describe('Integration', function () {
+    describe('Default instance', function () {
 
         it('should provide built in rules and templates', function () {
 
@@ -146,7 +146,7 @@ describe('ValidatorFactory', function () {
                 'key31' => 'url',
                 'key32.*.nested' => 'email',
                 'key33.*.nested' => 'email',
-                'key34.*.nested' => 'alpha|email',
+                'key34.*.nested1.*.nested2' => 'alpha|email',
             ]);
 
             $validator = $validator->withLabels([
@@ -155,8 +155,8 @@ describe('ValidatorFactory', function () {
 
             $validator = $validator->withTemplates([
                 'key33.*.nested' => 'error1',
-                'key34.*.nested.alpha' => 'error2',
-                'key34.*.nested.email' => 'error3',
+                'key34.*.nested1.*.nested2.alpha' => 'error2',
+                'key34.*.nested1.*.nested2.email' => 'error3',
             ]);
 
             $result = $validator->validate([
@@ -192,7 +192,7 @@ describe('ValidatorFactory', function () {
                 'key31' => 'value',
                 'key32' => [['nested' => 'value1'], ['nested' => 'value2']],
                 'key33' => [['nested' => 'value1'], ['nested' => 'value2']],
-                'key34' => [['nested' => 'value1'], ['nested' => 'value2']],
+                'key34' => [['nested1' => [['nested2' => 'value1']]], ['nested1' => [['nested2' => 'value2']]]],
             ]);
 
             expect($result->passed())->to->be->false();
