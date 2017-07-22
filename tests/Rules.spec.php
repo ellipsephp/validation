@@ -486,19 +486,238 @@ describe('SlugRule', function () {
 
 });
 
+describe('DateRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\DateRule;
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is a string representation of a date', function () {
+
+            expect($this->rule)->with('2017-07-22')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a string representation of a date', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('DateFormatRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\DateFormatRule('Y-m-d');
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value matches the date format', function () {
+
+            expect($this->rule)->with('2017-07-22')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a string representation of a date', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value does not matche the date format', function () {
+
+            expect($this->rule)->with('2017-07-22 13')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('DateAfterRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\DateAfterRule('2017-07-22');
+
+    });
+
+    it('should fail when the limit is not a string representation of a date', function () {
+
+        $factory = function ($limit) { return new Rules\DateAfterRule($limit); };
+
+        expect($factory)->with('limit')->to->throw(InvalidArgumentException::class);
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the date is after the limit', function () {
+
+            expect($this->rule)->with('2017-07-22')->to->not->throw(ValidationException::class);
+            expect($this->rule)->with('2017-07-23')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a string representation of a date', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is before the limit', function () {
+
+            expect($this->rule)->with('2017-07-21')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('DateBeforeRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\DateBeforeRule('2017-07-22');
+
+    });
+
+    it('should fail when the limit is not a string representation of a date', function () {
+
+        $factory = function ($limit) { return new Rules\DateBeforeRule($limit); };
+
+        expect($factory)->with('limit')->to->throw(InvalidArgumentException::class);
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the date is before the limit', function () {
+
+            expect($this->rule)->with('2017-07-21')->to->not->throw(ValidationException::class);
+            expect($this->rule)->with('2017-07-22')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a string representation of a date', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is after the limit', function () {
+
+            expect($this->rule)->with('2017-07-23')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('DateBetweenRule', function () {
+
+    beforeEach(function () {
+
+        $this->factory = function ($after, $before) { return new Rules\DateBetweenRule($after, $before); };
+        $this->rule = new Rules\DateBetweenRule('2017-07-20', '2017-07-23');
+
+    });
+
+    it('should fail when either the min or max limit is not a string representation of a date', function () {
+
+        expect($this->factory)->with('limit', '2017-07-23')->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with('2017-07-20', 'limit')->to->throw(InvalidArgumentException::class);
+
+    });
+
+    it('should fail when the min date is after the max date', function () {
+
+        expect($this->factory)->with('2017-07-23', '2017-07-20')->to->throw(InvalidArgumentException::class);
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the date is between the limits', function () {
+
+            expect($this->rule)->with('2017-07-20')->to->not->throw(ValidationException::class);
+            expect($this->rule)->with('2017-07-21')->to->not->throw(ValidationException::class);
+            expect($this->rule)->with('2017-07-22')->to->not->throw(ValidationException::class);
+            expect($this->rule)->with('2017-07-23')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a string representation of a date', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not between the limits', function () {
+
+            expect($this->rule)->with('2017-07-19')->to->throw(ValidationException::class);
+            expect($this->rule)->with('2017-07-24')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
 describe('MinRule', function () {
 
     beforeEach(function () {
 
+        $this->factory = function ($limit) { return new Rules\MinRule($limit); };
         $this->rule = new Rules\MinRule(10);
 
     });
 
     it('should fail when the limit is not numeric', function () {
 
-        $factory = function ($limit) { return new Rules\MinRule($limit); };
-
-        expect($factory)->with('limit')->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with('limit')->to->throw(InvalidArgumentException::class);
 
     });
 
@@ -609,15 +828,14 @@ describe('MaxRule', function () {
 
     beforeEach(function () {
 
+        $this->factory = function ($limit) { return new Rules\MaxRule($limit); };
         $this->rule = new Rules\MaxRule(10);
 
     });
 
     it('should fail when the limit is not numeric', function () {
 
-        $factory = function ($limit) { return new Rules\MaxRule($limit); };
-
-        expect($factory)->with('limit')->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with('limit')->to->throw(InvalidArgumentException::class);
 
     });
 
@@ -729,15 +947,21 @@ describe('BetweenRule', function () {
 
     beforeEach(function () {
 
+        $this->factory = function ($min, $max) { return new Rules\BetweenRule($min, $max); };
         $this->rule = new Rules\BetweenRule(5, 10);
 
     });
 
-    it('should fail when the min limit is not numeric', function () {
+    it('should fail when either the min or max limit is not numeric', function () {
 
-        $factory = function ($min, $max) { return new Rules\BetweenRule($min, $max); };
+        expect($this->factory)->with('limit', 10)->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with(10, 'limit')->to->throw(InvalidArgumentException::class);
 
-        expect($factory)->with('limit', 10)->to->throw(InvalidArgumentException::class);
+    });
+
+    it('should fail when the min limit is grater than the max limit', function () {
+
+        expect($this->factory)->with(11, 10)->to->throw(InvalidArgumentException::class);
 
     });
 

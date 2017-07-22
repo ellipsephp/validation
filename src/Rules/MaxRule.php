@@ -22,11 +22,6 @@ class MaxRule
         $this->limit = $limit;
     }
 
-    public function getLimit()
-    {
-        return $this->limit;
-    }
-
     public function __invoke($value)
     {
         if (is_null($value)) return;
@@ -56,5 +51,10 @@ class MaxRule
         }
 
         throw new InvalidArgumentException('The given value is not countable');
+    }
+
+    public function getLimit()
+    {
+        return $this->limit;
     }
 }

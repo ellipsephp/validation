@@ -2,6 +2,8 @@
 
 namespace Ellipse\Validation\Rules;
 
+use InvalidArgumentException;
+
 use Ellipse\Validation\Exceptions\ValidationException;
 
 class BetweenRule
@@ -13,6 +15,18 @@ class BetweenRule
     {
         $this->min = new MinRule($min);
         $this->max = new MaxRule($max);
+
+        try {
+
+            ($this->min)($max);
+
+        }
+
+        catch (ValidationException $e) {
+
+            throw new InvalidArgumentException('The min value is after the max value');
+
+        }
     }
 
     public function __invoke($value)
