@@ -28,6 +28,8 @@ class ValidatorFactory
         Rules\NumericRule::class,
         Rules\PresentRule::class,
         Rules\SlugRule::class,
+        Rules\UrlActiveRule::class,
+        Rules\UrlRule::class,
     ];
 
     /**

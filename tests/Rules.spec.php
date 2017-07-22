@@ -319,6 +319,73 @@ describe('IpRule', function () {
 
 });
 
+describe('UrlRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\UrlRule;
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is a string representation of an url', function () {
+
+            expect($this->rule)->with('http://google.com')->to->not->throw(ValidationException::class);
+            expect($this->rule)->with('https://google.com')->to->not->throw(ValidationException::class);
+            expect($this->rule)->with('ftp://google.com')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a string representation of an url', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('UrlActiveRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\UrlActiveRule;
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is a string representation of an active url', function () {
+
+            expect($this->rule)->with('http://google.com')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a string representation of an active url', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+            expect($this->rule)->with('http://jhfsqj.com')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
 describe('AlphaRule', function () {
 
     beforeEach(function () {
