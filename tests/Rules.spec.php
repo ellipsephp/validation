@@ -110,6 +110,44 @@ describe('NotBlankRule', function () {
 
 });
 
+
+describe('RequiredRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\RequiredRule;
+
+    });
+
+    describe('->__invoke()', function () {
+
+        it('should not fail when the key is present in the scope and not blank', function () {
+
+            expect($this->rule)->with('value', 'key', ['key' => 'value'])
+                ->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the key is not present in the scope', function () {
+
+            expect($this->rule)->with(null, 'absent', ['key' => 'value'])
+                ->to->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is an empty string', function () {
+
+            expect($this->rule)->with('', 'key', ['key' => ''])
+                ->to->throw(ValidationException::class);
+
+        });
+
+        // Same as not blank for other kind of values.
+
+    });
+
+});
+
 describe('ArrayRule', function () {
 
     beforeEach(function () {

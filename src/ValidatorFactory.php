@@ -35,6 +35,7 @@ class ValidatorFactory
         'notin'         => Rules\NotInRule::class,
         'numeric'       => Rules\NumericRule::class,
         'present'       => Rules\PresentRule::class,
+        'required'      => Rules\RequiredRule::class,
         'slug'          => Rules\SlugRule::class,
         'urlactive'     => Rules\UrlActiveRule::class,
         'url'           => Rules\UrlRule::class,

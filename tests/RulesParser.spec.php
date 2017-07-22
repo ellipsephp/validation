@@ -250,6 +250,39 @@ describe('RulesParser', function () {
 
         });
 
+        it('should replace the factory names when the array key is a string', function () {
+
+            $definition1 = $this->definition('key', ['key' => 'value']);
+            $definition2 = $this->definition('key', ['key' => 'value']);
+            $definition3 = $this->definition('key', ['key' => 'value']);
+
+            $factory1 = $this->factory($definition1, ['v11', 'v12']);
+            $factory2 = $this->factory($definition2, ['v21', 'v22']);
+            $factory3 = $this->factory($definition3, ['v31', 'v32']);
+
+            $definition = ['factory1:v11,v12', 'f2' => 'factory2:v21,v22', 'f3' => 'factory3:v31,v32'];
+
+            $parser = new RulesParser([
+                'factory1' => $factory1,
+                'factory2' => $factory2,
+                'factory3' => $factory3,
+            ]);
+
+            $test = $parser->parseRulesDefinition($definition);
+
+            expect($test)->to->be->an('array');
+            expect($test)->to->have->length(3);
+            expect($test)->to->include->keys(['factory1', 'f2', 'f3']);
+            expect($test['factory1'])->to->be->an->instanceof(Rule::class);
+            expect($test['f2'])->to->be->an->instanceof(Rule::class);
+            expect($test['f3'])->to->be->an->instanceof(Rule::class);
+
+            $test['factory1']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            $test['f2']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            $test['f3']->validate('key', ['key' => 'value'], ['key' => 'value']);
+
+        });
+
         it('should return a named array of rules from a string of factories', function () {
 
             $definition1 = $this->definition('key', ['key' => 'value']);

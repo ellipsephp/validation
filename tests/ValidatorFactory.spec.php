@@ -140,22 +140,23 @@ describe('ValidatorFactory', function () {
                 'key25' => 'notin:value1,value2',
                 'key26' => 'numeric',
                 'key27' => 'present',
-                'key28' => 'slug',
-                'key29' => 'urlactive',
-                'key30' => 'url',
-                'key31.*.nested' => 'email',
+                'key28' => 'required',
+                'key29' => 'slug',
+                'key30' => 'urlactive',
+                'key31' => 'url',
                 'key32.*.nested' => 'email',
-                'key33.*.nested' => 'alpha|email',
+                'key33.*.nested' => 'email',
+                'key34.*.nested' => 'alpha|email',
             ]);
 
             $validator = $validator->withLabels([
-                'key31.*.nested' => 'key31\'s emails',
+                'key32.*.nested' => 'key32\'s emails',
             ]);
 
             $validator = $validator->withTemplates([
-                'key32.*.nested' => 'error1',
-                'key33.*.nested.alpha' => 'error2',
-                'key33.*.nested.email' => 'error3',
+                'key33.*.nested' => 'error1',
+                'key34.*.nested.alpha' => 'error2',
+                'key34.*.nested.email' => 'error3',
             ]);
 
             $result = $validator->validate([
@@ -185,12 +186,13 @@ describe('ValidatorFactory', function () {
                 'key24' => '',
                 'key25' => 'value1',
                 'key26' => 'value',
-                'key28' => 'value#',
-                'key29' => 'http://sqlkfqlsf.com',
-                'key30' => 'value',
-                'key31' => [['nested' => 'value1'], ['nested' => 'value2']],
+                'key28' => '',
+                'key29' => 'value#',
+                'key30' => 'http://sqlkfqlsf.com',
+                'key31' => 'value',
                 'key32' => [['nested' => 'value1'], ['nested' => 'value2']],
                 'key33' => [['nested' => 'value1'], ['nested' => 'value2']],
+                'key34' => [['nested' => 'value1'], ['nested' => 'value2']],
             ]);
 
             expect($result->passed())->to->be->false();
@@ -224,17 +226,18 @@ describe('ValidatorFactory', function () {
             expect($messages[24])->to->be->equal('The key25 must not be in value1, value2.');
             expect($messages[25])->to->be->equal('The key26 must be numeric.');
             expect($messages[26])->to->be->equal('The key27 must be present.');
-            expect($messages[27])->to->be->equal('The key28 must contain only letters, numbers, dashes and underscores.');
-            expect($messages[28])->to->be->equal('The key29 must be an active url.');
-            expect($messages[29])->to->be->equal('The key30 must be an url.');
-            expect($messages[30])->to->be->equal('The key31\'s emails must be an email.');
-            expect($messages[31])->to->be->equal('The key31\'s emails must be an email.');
-            expect($messages[32])->to->be->equal('error1');
+            expect($messages[27])->to->be->equal('The key28 is required.');
+            expect($messages[28])->to->be->equal('The key29 must contain only letters, numbers, dashes and underscores.');
+            expect($messages[29])->to->be->equal('The key30 must be an active url.');
+            expect($messages[30])->to->be->equal('The key31 must be an url.');
+            expect($messages[31])->to->be->equal('The key32\'s emails must be an email.');
+            expect($messages[32])->to->be->equal('The key32\'s emails must be an email.');
             expect($messages[33])->to->be->equal('error1');
-            expect($messages[34])->to->be->equal('error2');
-            expect($messages[35])->to->be->equal('error3');
-            expect($messages[36])->to->be->equal('error2');
-            expect($messages[37])->to->be->equal('error3');
+            expect($messages[34])->to->be->equal('error1');
+            expect($messages[35])->to->be->equal('error2');
+            expect($messages[36])->to->be->equal('error3');
+            expect($messages[37])->to->be->equal('error2');
+            expect($messages[38])->to->be->equal('error3');
 
         });
 

@@ -63,21 +63,22 @@ class RulesParser
 
             $parts = explode(':', $definition);
 
-            $name = $parts[0];
+            $factory_name = $parts[0];
             $parameters = $parts[1] ?? null;
 
             $parameters = ! is_null($parameters)
                 ? explode(',', $parameters)
                 : [];
 
-            $name = trim($name);
+            $factory_name = trim($factory_name);
             $parameters = array_map('trim', $parameters);
 
-            $factory = $this->getRuleFactory($name);
+            $factory = $this->getRuleFactory($factory_name);
 
-            $assert = $factory($parameters);
+            $name = is_string($key) ? $key : $factory_name;
+            $validate = $factory($parameters);
 
-            return [$name => new Rule($assert)];
+            return [$name => new Rule($validate)];
 
         }
 
