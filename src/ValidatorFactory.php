@@ -23,6 +23,8 @@ class ValidatorFactory
         Rules\DifferentRule::class,
         Rules\EmailRule::class,
         Rules\EqualsRule::class,
+        Rules\HaveDifferentRule::class,
+        Rules\HaveSameRule::class,
         Rules\InRule::class,
         Rules\IntegerRule::class,
         Rules\IpRule::class,

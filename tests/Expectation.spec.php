@@ -184,45 +184,64 @@ describe('Expectation', function () {
             $rule1 = Mockery::mock(Rule::class);
             $rule2 = Mockery::mock(Rule::class);
 
+            $nested = [
+                ['nested' => 'value1'],
+                ['nested' => 'value2'],
+                ['nested' => 'value3'],
+            ];
+
             $input = [
-                'key' => [
-                    'value1',
-                    'value2',
-                    'value3',
-                ],
+                'key' => $nested,
             ];
 
             $rules = ['rule1' => $rule1, 'rule2' => $rule2];
 
             $expectation = new Expectation('key.*', $rules);
 
-            $rule1->shouldReceive('validate')->once()->with('0', ['value1', 'value2', 'value3'], $input);
-            $rule1->shouldReceive('validate')->once()->with('1', ['value1', 'value2', 'value3'], $input)
+            $rule1->shouldReceive('validate')->once()->with('*', $nested, $input)
                 ->andThrow(new ValidationException(['p1' => 'v1']));
-            $rule1->shouldReceive('validate')->once()->with('2', ['value1', 'value2', 'value3'], $input)
-                ->andThrow(new ValidationException(['p2' => 'v2']));
 
-            $rule2->shouldReceive('validate')->once()->with('0', ['value1', 'value2', 'value3'], $input);
-            $rule2->shouldReceive('validate')->once()->with('1', ['value1', 'value2', 'value3'], $input);
-            $rule2->shouldReceive('validate')->once()->with('2', ['value1', 'value2', 'value3'], $input)
-                ->andThrow(new ValidationException(['p3' => 'v3']));
+            $rule2->shouldReceive('validate')->once()->with('*', $nested, $input);
 
             $test = $expectation->validate($input);
 
             expect($test)->to->be->an('array');
-            expect($test)->to->have->length(3);
+            expect($test)->to->have->length(1);
             expect($test[0])->to->be->an->instanceof(ValidationError::class);
             expect($test[0]->getKey())->to->be->equal('key.*');
             expect($test[0]->getRule())->to->be->equal('rule1');
             expect($test[0]->getParameters())->to->be->equal(['p1' => 'v1']);
-            expect($test[1])->to->be->an->instanceof(ValidationError::class);
-            expect($test[1]->getKey())->to->be->equal('key.*');
-            expect($test[1]->getRule())->to->be->equal('rule1');
-            expect($test[1]->getParameters())->to->be->equal(['p2' => 'v2']);
-            expect($test[2])->to->be->an->instanceof(ValidationError::class);
-            expect($test[2]->getKey())->to->be->equal('key.*');
-            expect($test[2]->getRule())->to->be->equal('rule2');
-            expect($test[2]->getParameters())->to->be->equal(['p3' => 'v3']);
+
+        });
+
+        it('should be able to handle input containing only nested array', function () {
+
+            $rule1 = Mockery::mock(Rule::class);
+            $rule2 = Mockery::mock(Rule::class);
+
+            $input = [
+                ['key' => 'value1'],
+                ['key' => 'value2'],
+                ['key' => 'value3'],
+            ];
+
+            $rules = ['rule1' => $rule1, 'rule2' => $rule2];
+
+            $expectation = new Expectation('*', $rules);
+
+            $rule1->shouldReceive('validate')->once()->with('*', $input, $input)
+                ->andThrow(new ValidationException(['p1' => 'v1']));
+
+            $rule2->shouldReceive('validate')->once()->with('*', $input, $input);
+
+            $test = $expectation->validate($input);
+
+            expect($test)->to->be->an('array');
+            expect($test)->to->have->length(1);
+            expect($test[0])->to->be->an->instanceof(ValidationError::class);
+            expect($test[0]->getKey())->to->be->equal('*');
+            expect($test[0]->getRule())->to->be->equal('rule1');
+            expect($test[0]->getParameters())->to->be->equal(['p1' => 'v1']);
 
         });
 

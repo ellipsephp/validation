@@ -1344,3 +1344,95 @@ describe('NotAcceptedRule', function () {
     });
 
 });
+
+describe('HaveDifferentRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\HaveDifferentRule('field');
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should fail when the value is not *', function () {
+
+            expect($this->rule)->with('value')->to->not->throw(LogicException::class);
+
+        });
+
+        it('should not fail when all the arrays have different value for the field', function () {
+
+            $scope = [
+                ['field' => 'value1'],
+                ['field' => 'value2'],
+                ['field' => 'value3'],
+                [],
+            ];
+
+            expect($this->rule)->with('*', $scope)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when all the arrays does not have different value for the field', function () {
+
+            $scope = [
+                ['field' => 'value'],
+                ['field' => 'value1'],
+                ['field' => 'value'],
+                [],
+            ];
+
+            expect($this->rule)->with('*', $scope)->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('HaveSameRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\HaveSameRule('field');
+
+    });
+
+    describe('->invoke()', function () {
+
+        it('should fail when the value is not *', function () {
+
+            expect($this->rule)->with('value')->to->not->throw(LogicException::class);
+
+        });
+
+        it('should not fail when all the arrays have the same value for the field', function () {
+
+            $scope = [
+                ['field' => 'value'],
+                ['field' => 'value'],
+                ['field' => 'value'],
+                [],
+            ];
+
+            expect($this->rule)->with('*', $scope)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when all the arrays does not have the same value for the field', function () {
+
+            $scope = [
+                ['field' => 'value'],
+                ['field' => 'value1'],
+                ['field' => 'value'],
+                [],
+            ];
+
+            expect($this->rule)->with('*', $scope)->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});

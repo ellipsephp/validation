@@ -26,21 +26,13 @@ class Expectation
         $current = array_shift($parts);
         $next = implode('.', $parts);
 
-        if ($current == '*') {
+        if ($current == '*' && count($parts) > 0) {
 
             $errors = [];
 
             foreach ($scope as $key => $nested) {
 
-                if (count($parts) == 0) {
-
-                    $new_errors = $this->getNestedErrors((string) $key, $scope, $input);
-
-                } else {
-
-                    $new_errors = $this->getNestedErrors($next, $nested, $input);
-
-                }
+                $new_errors = $this->getNestedErrors($next, $nested, $input);
 
                 $errors = array_merge($errors, $new_errors);
 
