@@ -11,6 +11,12 @@ describe('Translator', function () {
 
     });
 
+    afterEach(function () {
+
+        Mockery::close();
+
+    });
+
     describe('->withLabels()', function () {
 
         it('should return a new translator with the given labels', function () {

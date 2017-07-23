@@ -1179,33 +1179,75 @@ describe('BetweenRule', function () {
 
 describe('EqualsRule', function () {
 
-    beforeEach(function () {
+    context('when comparing with a root key', function () {
 
-        $this->rule = new Rules\EqualsRule('other');
+        beforeEach(function () {
+
+            $this->rule = new Rules\EqualsRule('other');
+
+        });
+
+        describe('->invoke()', function () {
+
+            it('should not fail when the value is null', function () {
+
+                expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should not fail when the value and the one from the root key are equals', function () {
+
+                $scope = ['key' => 'value'];
+                $input = ['scope' => $scope, 'other' => 'value'];
+
+                expect($this->rule)->with('value', 'key', $scope, $input)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the value and the one from the root key are not equals', function () {
+
+                $scope = ['key' => 'value'];
+                $input = ['scope' => $scope, 'other' => 'other'];
+
+                expect($this->rule)->with('value', 'key', $scope, $input)->to->throw(ValidationException::class);
+
+            });
+
+        });
 
     });
 
-    describe('->invoke()', function () {
+    context('when comparing keys of the same scope', function () {
 
-        it('should not fail when the value is null', function () {
+        beforeEach(function () {
 
-            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
-
-        });
-
-        it('should not fail when the value and the one from the other key of the scope are equals', function () {
-
-            $scope = ['key' => 'value', 'other' => 'value'];
-
-            expect($this->rule)->with('value', 'key', $scope)->to->not->throw(ValidationException::class);
+            $this->rule = new Rules\EqualsRule('>other');
 
         });
 
-        it('should fail when the value and the one from the other key of the scope are not equals', function () {
+        describe('->invoke()', function () {
 
-            $scope = ['key' => 'value', 'other' => 'other'];
+            it('should not fail when the value is null', function () {
 
-            expect($this->rule)->with('value', 'key', $scope)->to->throw(ValidationException::class);
+                expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should not fail when the value and the one from the other key of the scope are equals', function () {
+
+                $scope = ['key' => 'value', 'other' => 'value'];
+
+                expect($this->rule)->with('value', 'key', $scope)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the value and the one from the other key of the scope are not equals', function () {
+
+                $scope = ['key' => 'value', 'other' => 'other'];
+
+                expect($this->rule)->with('value', 'key', $scope)->to->throw(ValidationException::class);
+
+            });
 
         });
 
@@ -1215,33 +1257,75 @@ describe('EqualsRule', function () {
 
 describe('DifferentRule', function () {
 
-    beforeEach(function () {
+    context('when comparing with a root key', function () {
 
-        $this->rule = new Rules\DifferentRule('other');
+        beforeEach(function () {
+
+            $this->rule = new Rules\DifferentRule('other');
+
+        });
+
+        describe('->invoke()', function () {
+
+            it('should not fail when the value is null', function () {
+
+                expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should not fail when the value and the one from the root key are not equals', function () {
+
+                $scope = ['key' => 'value'];
+                $input = ['scope' => $scope, 'other' => 'other'];
+
+                expect($this->rule)->with('value', 'key', $scope, $input)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the value and the one from the root key are equals', function () {
+
+                $scope = ['key' => 'value'];
+                $input = ['scope' => $scope, 'other' => 'value'];
+
+                expect($this->rule)->with('value', 'key', $scope, $input)->to->throw(ValidationException::class);
+
+            });
+
+        });
 
     });
 
-    describe('->invoke()', function () {
+    context('when comparing keys of the same scope', function () {
 
-        it('should not fail when the value is null', function () {
+        beforeEach(function () {
 
-            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
-
-        });
-
-        it('should not fail when the value and the one from the other key of the scope are not equals', function () {
-
-            $scope = ['key' => 'value', 'other' => 'other'];
-
-            expect($this->rule)->with('value', 'key', $scope)->to->not->throw(ValidationException::class);
+            $this->rule = new Rules\DifferentRule('>other');
 
         });
 
-        it('should fail when the value and the one from the other key of the scope are equals', function () {
+        describe('->invoke()', function () {
 
-            $scope = ['key' => 'value', 'other' => 'value'];
+            it('should not fail when the value is null', function () {
 
-            expect($this->rule)->with('value', 'key', $scope)->to->throw(ValidationException::class);
+                expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should not fail when the value and the one from the other key of the scope are not equals', function () {
+
+                $scope = ['key' => 'value', 'other' => 'other'];
+
+                expect($this->rule)->with('value', 'key', $scope)->to->not->throw(ValidationException::class);
+
+            });
+
+            it('should fail when the value and the one from the other key of the scope are equals', function () {
+
+                $scope = ['key' => 'value', 'other' => 'value'];
+
+                expect($this->rule)->with('value', 'key', $scope)->to->throw(ValidationException::class);
+
+            });
 
         });
 
