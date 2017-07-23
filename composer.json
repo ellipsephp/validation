@@ -1,7 +1,7 @@
 {
     "name": "ellipse/validation",
     "type": "library",
-    "description": "The session component of the ellipse framework",
+    "description": "The validation component of the ellipse framework",
     "keywords": [
         "Psr-15",
         "middleware",
