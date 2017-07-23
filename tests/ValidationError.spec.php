@@ -6,23 +6,10 @@ describe('ValidationError', function () {
 
     beforeEach(function () {
 
-        $this->key = 'key';
         $this->rule = 'rule';
         $this->parameters = ['p1' => 'parameters'];
 
-        $this->error = new ValidationError($this->key, $this->rule, $this->parameters);
-
-    });
-
-    describe('->getKey()', function () {
-
-        it('should return the error key', function () {
-
-            $test = $this->error->getKey();
-
-            expect($test)->to->be->equal($this->key);
-
-        });
+        $this->error = new ValidationError($this->rule, $this->parameters);
 
     });
 

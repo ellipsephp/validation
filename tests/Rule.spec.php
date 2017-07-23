@@ -9,33 +9,47 @@ class RuleCallable
 
 describe('Rule', function () {
 
-    beforeEach(function () {
-
-        $this->key = 'key';
-        $this->value = 'value';
-        $this->scope = [$this->key => $this->value];
-        $this->input = ['input' => [$this->key => $this->value]];
-
-        $this->rule = function ($value, $key, $scope, $input) {
-
-            $assert = Mockery::mock(RuleCallable::class);
-
-            $assert->shouldReceive('__invoke')->once()
-                ->with($value, $key, $scope, $input);
-
-            return new Rule($assert);
-
-        };
-
-    });
-
     afterEach(function () {
 
         Mockery::close();
 
     });
 
+    describe('->getName()', function () {
+
+        it('should return the rule name', function () {
+
+            $rule = new Rule('name', function () {});
+
+            $test = $rule->getName();
+
+            expect($test)->to->be->equal($test);
+
+        });
+
+    });
+
     describe('->validate()', function () {
+
+        beforeEach(function () {
+
+            $this->key = 'key';
+            $this->value = 'value';
+            $this->scope = [$this->key => $this->value];
+            $this->input = ['input' => [$this->key => $this->value]];
+
+            $this->rule = function ($value, $key, $scope, $input) {
+
+                $validate = Mockery::mock(RuleCallable::class);
+
+                $validate->shouldReceive('__invoke')->once()
+                    ->with($value, $key, $scope, $input);
+
+                return new Rule('name', $validate);
+
+            };
+
+        });
 
         it('should call rule with the value, the input and the key', function () {
 

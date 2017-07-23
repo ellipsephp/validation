@@ -233,11 +233,10 @@ describe('ValidatorFactory', function () {
             expect($messages[31])->to->be->equal('The key32\'s emails must be an email.');
             expect($messages[32])->to->be->equal('The key32\'s emails must be an email.');
             expect($messages[33])->to->be->equal('error1');
-            expect($messages[34])->to->be->equal('error1');
-            expect($messages[35])->to->be->equal('error2');
-            expect($messages[36])->to->be->equal('error3');
-            expect($messages[37])->to->be->equal('error2');
-            expect($messages[38])->to->be->equal('error3');
+            expect($messages[34])->to->be->equal('error2');
+            expect($messages[35])->to->be->equal('error3');
+            expect($messages[36])->to->be->equal('error2');
+            expect($messages[37])->to->be->equal('error3');
 
         });
 

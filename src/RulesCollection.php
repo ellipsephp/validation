@@ -4,20 +4,25 @@ namespace Ellipse\Validation;
 
 use Ellipse\Validation\Exceptions\ValidationException;
 
-class Expectation
+class RulesCollection
 {
-    private $key;
     private $rules;
 
-    public function __construct(string $key, array $rules)
+    public function __construct(array $rules = [])
     {
-        $this->key = $key;
         $this->rules = $rules;
     }
 
-    public function validate(array $input): array
+    public function withRule(Rule $rule): RulesCollection
     {
-        return $this->getNestedErrors($this->key, $input, $input);
+        $rules = array_merge($this->rules, [$rule]);
+
+        return new RulesCollection($rules);
+    }
+
+    public function validate(string $key, array $input): array
+    {
+        return $this->getNestedErrors($key, $input, $input);
     }
 
     private function getNestedErrors(string $key, array $scope, array $input): array
@@ -55,7 +60,7 @@ class Expectation
     {
         $errors = [];
 
-        foreach ($this->rules as $name => $rule) {
+        foreach ($this->rules as $rule) {
 
             try {
 
@@ -67,7 +72,7 @@ class Expectation
 
                 $parameters = $e->getParameters();
 
-                $errors[] = new ValidationError($this->key, (string) $name, $parameters);
+                $errors[] = new ValidationError($rule->getName(), $parameters);
 
             }
 

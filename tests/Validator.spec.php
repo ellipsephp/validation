@@ -1,8 +1,8 @@
 <?php
 
-use Ellipse\Validation\Rule;
 use Ellipse\Validation\Validator;
 use Ellipse\Validation\RulesParser;
+use Ellipse\Validation\RulesCollection;
 use Ellipse\Validation\Translator;
 use Ellipse\Validation\ValidationError;
 use Ellipse\Validation\ValidationResult;
@@ -84,21 +84,21 @@ describe('Validator', function () {
                 'key2' => 'definition2',
             ];
 
-            $rule1 = Mockery::mock(Rule::class);
-            $rule2 = Mockery::mock(Rule::class);
+            $rules1 = Mockery::mock(RulesCollection::class);
+            $rules2 = Mockery::mock(RulesCollection::class);
 
             $validator = new Validator($rules, $this->parser, $this->translator);
 
             $this->parser->shouldReceive('parseRulesDefinition')->once()
                 ->with('definition1')
-                ->andReturn([$rule1]);
+                ->andReturn($rules1);
 
             $this->parser->shouldReceive('parseRulesDefinition')->once()
                 ->with('definition2')
-                ->andReturn([$rule2]);
+                ->andReturn($rules2);
 
-            $rule1->shouldReceive('validate')->once()->with('key1', $input, $input);
-            $rule2->shouldReceive('validate')->once()->with('key2', $input, $input);
+            $rules1->shouldReceive('validate')->once()->with('key1', $input);
+            $rules2->shouldReceive('validate')->once()->with('key2', $input);
 
             $test = $validator->validate($input);
 
@@ -121,51 +121,46 @@ describe('Validator', function () {
                 'key3' => 'definition3',
             ];
 
-            $rule1 = Mockery::mock(Rule::class);
-            $rule2 = Mockery::mock(Rule::class);
-            $rule3 = Mockery::mock(Rule::class);
-            $rule4 = Mockery::mock(Rule::class);
-
             $validator = new Validator($rules, $this->parser, $this->translator);
+
+            $rules1 = Mockery::mock(RulesCollection::class);
+            $rules2 = Mockery::mock(RulesCollection::class);
+            $rules3 = Mockery::mock(RulesCollection::class);
+
+            $error1 = Mockery::mock(RulesCollection::class);
+            $error2 = Mockery::mock(RulesCollection::class);
+            $error3 = Mockery::mock(RulesCollection::class);
 
             $this->parser->shouldReceive('parseRulesDefinition')->once()
                 ->with('definition1')
-                ->andReturn([$rule1]);
+                ->andReturn($rules1);
 
             $this->parser->shouldReceive('parseRulesDefinition')->once()
                 ->with('definition2')
-                ->andReturn([$rule2]);
+                ->andReturn($rules2);
 
             $this->parser->shouldReceive('parseRulesDefinition')->once()
                 ->with('definition3')
-                ->andReturn([$rule3, $rule4]);
+                ->andReturn($rules3);
 
-            $rule1->shouldReceive('validate')->once()
-                ->with('key1', $input, $input)
-                ->andThrow(new ValidationException);
+            $rules1->shouldReceive('validate')->once()
+                ->with('key1', $input)
+                ->andReturn([$error1]);
 
-            $rule2->shouldReceive('validate')->once()
-                ->with('key2', $input, $input);
+            $rules2->shouldReceive('validate')->once()
+                ->with('key2', $input);
 
-            $rule3->shouldReceive('validate')->once()
-                ->with('key3', $input, $input)
-                ->andThrow(new ValidationException);
+            $rules3->shouldReceive('validate')->once()
+                ->with('key3', $input)
+                ->andReturn([$error2, $error3]);
 
-            $rule4->shouldReceive('validate')->once()
-                ->with('key3', $input, $input)
-                ->andThrow(new ValidationException);
+            $this->translator->shouldReceive('getMessages')->once()
+                ->with('key1', [$error1])
+                ->andReturn(['error1']);
 
-            $this->translator->shouldReceive('translate')->once()
-                ->with(Mockery::type(ValidationError::class))
-                ->andReturn('error1');
-
-            $this->translator->shouldReceive('translate')->once()
-                ->with(Mockery::type(ValidationError::class))
-                ->andReturn('error2');
-
-            $this->translator->shouldReceive('translate')->once()
-                ->with(Mockery::type(ValidationError::class))
-                ->andReturn('error3');
+            $this->translator->shouldReceive('getMessages')->once()
+                ->with('key3', [$error2, $error3])
+                ->andReturn(['error2', 'error3']);
 
             $test = $validator->validate($input);
 

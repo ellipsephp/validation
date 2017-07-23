@@ -22,7 +22,9 @@ describe('ValidationResult', function () {
 
         it('should return true when there is no validation error', function () {
 
-            $result = new ValidationResult([], $this->translator);
+            $results = ['key' => []];
+
+            $result = new ValidationResult($results, $this->translator);
 
             $test = $result->passed();
 
@@ -32,9 +34,9 @@ describe('ValidationResult', function () {
 
         it('should return false when there is validation errors', function () {
 
-            $errors = [Mockery::mock(ValidationError::class)];
+            $results = ['key' => [Mockery::mock(ValidationError::class)]];
 
-            $result = new ValidationResult($errors, $this->translator);
+            $result = new ValidationResult($results, $this->translator);
 
             $test = $result->passed();
 
@@ -48,7 +50,9 @@ describe('ValidationResult', function () {
 
         it('should return false when there is not validation error', function () {
 
-            $result = new ValidationResult([], $this->translator);
+            $results = ['key' => []];
+
+            $result = new ValidationResult($results, $this->translator);
 
             $test = $result->failed();
 
@@ -58,9 +62,9 @@ describe('ValidationResult', function () {
 
         it('should return true when there is validation errors', function () {
 
-            $errors = [Mockery::mock(ValidationError::class)];
+            $results = ['key' => [Mockery::mock(ValidationError::class)]];
 
-            $result = new ValidationResult($errors, $this->translator);
+            $result = new ValidationResult($results, $this->translator);
 
             $test = $result->failed();
 
@@ -76,23 +80,31 @@ describe('ValidationResult', function () {
 
             $error1 = Mockery::mock(ValidationError::class);
             $error2 = Mockery::mock(ValidationError::class);
+            $error3 = Mockery::mock(ValidationError::class);
 
-            $result = new ValidationResult([$error1, $error2], $this->translator);
+            $results = [
+                'key1' => [],
+                'key2' => [$error1, $error2],
+                'key3' => [$error3],
+            ];
 
-            $this->translator->shouldReceive('translate')->once()
-                ->with($error1)
-                ->andReturn('error1');
+            $result = new ValidationResult($results, $this->translator);
 
-            $this->translator->shouldReceive('translate')->once()
-                ->with($error2)
-                ->andReturn('error2');
+            $this->translator->shouldReceive('getMessages')->once()
+                ->with('key2', [$error1, $error2])
+                ->andReturn(['error1', 'error2']);
+
+            $this->translator->shouldReceive('getMessages')->once()
+                ->with('key3', [$error3])
+                ->andReturn(['error3']);
 
             $test = $result->getMessages();
 
             expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
+            expect($test)->to->have->length(3);
             expect($test[0])->to->be->equal('error1');
             expect($test[1])->to->be->equal('error2');
+            expect($test[2])->to->be->equal('error3');
 
         });
 

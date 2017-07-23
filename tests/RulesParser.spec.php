@@ -1,7 +1,9 @@
 <?php
 
 use Ellipse\Validation\Rule;
+use Ellipse\Validation\RulesCollection;
 use Ellipse\Validation\RulesParser;
+use Ellipse\Validation\Exceptions\ValidationException;
 
 class RuleParserCallable
 {
@@ -12,18 +14,19 @@ describe('RulesParser', function () {
 
     beforeEach(function () {
 
-        $this->definition = function (string $key, array $scope) {
+        $this->definition = function (string $key, array $scope, array $parameters = []) {
 
-            $definition = Mockery::mock(RuleParserCallable::class);
+            $validate = Mockery::mock(RuleParserCallable::class);
 
-            $definition->shouldReceive('__invoke')->once()
-                ->with($scope[$key], $key, $scope, $scope);
+            $validate->shouldReceive('__invoke')->once()
+                ->with($scope[$key], $key, $scope, $scope)
+                ->andThrow(new ValidationException($parameters));
 
-            return $definition;
+            return $validate;
 
         };
 
-        $this->factory = function ($definition, array $parameters) {
+        $this->factory = function ($definition, array $parameters = []) {
 
             $factory = Mockery::mock(RuleParserCallable::class);
 
@@ -53,12 +56,14 @@ describe('RulesParser', function () {
 
             $test = $parser->parseRulesDefinition($definition);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(1);
-            expect($test)->to->include->keys([0]);
-            expect($test[0])->to->be->an->instanceof(Rule::class);
+            expect($test)->to->be->an->instanceof(RulesCollection::class);
 
-            $test[0]->validate('key', ['key' => 'value'], ['key' => 'value']);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
+
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(1);
+            expect($errors[0]->getRule())->to->be->equal('0');
+            expect($errors[0]->getParameters())->to->be->equal([]);
 
         });
 
@@ -67,20 +72,20 @@ describe('RulesParser', function () {
             $definition1 = $this->definition('key', ['key' => 'value']);
             $definition2 = $this->definition('key', ['key' => 'value']);
 
-            $definition = [$definition1, $definition2];
-
             $parser = new RulesParser;
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition([$definition1, $definition2]);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test)->to->include->keys([0, 1]);
-            expect($test[0])->to->be->an->instanceof(Rule::class);
-            expect($test[1])->to->be->an->instanceof(Rule::class);
+            expect($test)->to->be->an->instanceof(RulesCollection::class);
 
-            $test[0]->validate('key', ['key' => 'value'], ['key' => 'value']);
-            $test[1]->validate('key', ['key' => 'value'], ['key' => 'value']);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
+
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(2);
+            expect($errors[0]->getRule())->to->be->equal('0');
+            expect($errors[0]->getParameters())->to->be->equal([]);
+            expect($errors[1]->getRule())->to->be->equal('1');
+            expect($errors[1]->getParameters())->to->be->equal([]);
 
         });
 
@@ -89,80 +94,79 @@ describe('RulesParser', function () {
             $definition1 = $this->definition('key', ['key' => 'value']);
             $definition2 = $this->definition('key', ['key' => 'value']);
 
-            $definition = ['rule1' => $definition1, 'rule2' => $definition2];
-
             $parser = new RulesParser;
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition([
+                'rule1' => $definition1,
+                'rule2' => $definition2,
+            ]);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test)->to->include->keys(['rule1', 'rule2']);
-            expect($test['rule1'])->to->be->an->instanceof(Rule::class);
-            expect($test['rule2'])->to->be->an->instanceof(Rule::class);
+            expect($test)->to->be->an->instanceof(RulesCollection::class);
 
-            $test['rule1']->validate('key', ['key' => 'value'], ['key' => 'value']);
-            $test['rule2']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
+
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(2);
+            expect($errors[0]->getRule())->to->be->equal('rule1');
+            expect($errors[0]->getParameters())->to->be->equal([]);
+            expect($errors[1]->getRule())->to->be->equal('rule2');
+            expect($errors[1]->getParameters())->to->be->equal([]);
 
         });
 
         it('should return a named array of rules from a factory string', function () {
 
             $definition = $this->definition('key', ['key' => 'value']);
-            $factory = $this->factory($definition, []);
-
-            $definition = ['factory'];
+            $factory = $this->factory($definition);
 
             $parser = new RulesParser(['factory' => $factory]);
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition(['factory']);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(1);
-            expect($test)->to->include->keys(['factory']);
-            expect($test['factory'])->to->be->an->instanceof(Rule::class);
+            expect($test)->to->be->an->instanceof(RulesCollection::class);
 
-            $test['factory']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
+
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(1);
+            expect($errors[0]->getRule())->to->be->equal('factory');
+            expect($errors[0]->getParameters())->to->be->equal([]);
 
         });
 
         it('should return a named array of rules from a factory string with a parameter', function () {
 
-            $definition = $this->definition('key', ['key' => 'value']);
+            $definition = $this->definition('key', ['key' => 'value'], ['v1']);
             $factory = $this->factory($definition, ['v1']);
-
-            $definition = ['factory:v1'];
 
             $parser = new RulesParser(['factory' => $factory]);
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition(['factory:v1']);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(1);
-            expect($test)->to->include->keys(['factory']);
-            expect($test['factory'])->to->be->an->instanceof(Rule::class);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
 
-            $test['factory']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(1);
+            expect($errors[0]->getRule())->to->be->equal('factory');
+            expect($errors[0]->getParameters())->to->be->equal(['v1']);
 
         });
 
         it('should return a named array of rules from a factory string with multiple parameters', function () {
 
-            $definition = $this->definition('key', ['key' => 'value']);
+            $definition = $this->definition('key', ['key' => 'value'], ['v1', 'v2']);
             $factory = $this->factory($definition, ['v1', 'v2']);
-
-            $definition = ['factory:v1,v2'];
 
             $parser = new RulesParser(['factory' => $factory]);
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition(['factory:v1,v2']);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(1);
-            expect($test)->to->include->keys(['factory']);
-            expect($test['factory'])->to->be->an->instanceof(Rule::class);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
 
-            $test['factory']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(1);
+            expect($errors[0]->getRule())->to->be->equal('factory');
+            expect($errors[0]->getParameters())->to->be->equal(['v1', 'v2']);
 
         });
 
@@ -171,96 +175,88 @@ describe('RulesParser', function () {
             $definition1 = $this->definition('key', ['key' => 'value']);
             $definition2 = $this->definition('key', ['key' => 'value']);
 
-            $factory1 = $this->factory($definition1, []);
-            $factory2 = $this->factory($definition2, []);
-
-            $definition = ['factory1', 'factory2'];
+            $factory1 = $this->factory($definition1);
+            $factory2 = $this->factory($definition2);
 
             $parser = new RulesParser([
                 'factory1' => $factory1,
                 'factory2' => $factory2,
             ]);
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition(['factory1', 'factory2']);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test)->to->include->keys(['factory1', 'factory2']);
-            expect($test['factory1'])->to->be->an->instanceof(Rule::class);
-            expect($test['factory2'])->to->be->an->instanceof(Rule::class);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
 
-            $test['factory1']->validate('key', ['key' => 'value'], ['key' => 'value']);
-            $test['factory2']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(2);
+            expect($errors[0]->getRule())->to->be->equal('factory1');
+            expect($errors[0]->getParameters())->to->be->equal([]);
+            expect($errors[1]->getRule())->to->be->equal('factory2');
+            expect($errors[1]->getParameters())->to->be->equal([]);
 
         });
 
         it('should return a named array of rules from an array of factory strings with a parameter', function () {
 
-            $definition1 = $this->definition('key', ['key' => 'value']);
-            $definition2 = $this->definition('key', ['key' => 'value']);
+            $definition1 = $this->definition('key', ['key' => 'value'], ['v1']);
+            $definition2 = $this->definition('key', ['key' => 'value'], ['v2']);
 
-            $factory1 = $this->factory($definition1, ['v11']);
-            $factory2 = $this->factory($definition2, ['v21']);
-
-            $definition = ['factory1:v11', 'factory2:v21'];
+            $factory1 = $this->factory($definition1, ['v1']);
+            $factory2 = $this->factory($definition2, ['v2']);
 
             $parser = new RulesParser([
                 'factory1' => $factory1,
                 'factory2' => $factory2,
             ]);
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition(['factory1:v1', 'factory2:v2']);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test)->to->include->keys(['factory1', 'factory2']);
-            expect($test['factory1'])->to->be->an->instanceof(Rule::class);
-            expect($test['factory2'])->to->be->an->instanceof(Rule::class);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
 
-            $test['factory1']->validate('key', ['key' => 'value'], ['key' => 'value']);
-            $test['factory2']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(2);
+            expect($errors[0]->getRule())->to->be->equal('factory1');
+            expect($errors[0]->getParameters())->to->be->equal(['v1']);
+            expect($errors[1]->getRule())->to->be->equal('factory2');
+            expect($errors[1]->getParameters())->to->be->equal(['v2']);
 
         });
 
         it('should return a named array of rules from an array of factory strings with multiple parameters', function () {
 
-            $definition1 = $this->definition('key', ['key' => 'value']);
-            $definition2 = $this->definition('key', ['key' => 'value']);
+            $definition1 = $this->definition('key', ['key' => 'value'], ['v11', 'v12']);
+            $definition2 = $this->definition('key', ['key' => 'value'], ['v21', 'v22']);
 
             $factory1 = $this->factory($definition1, ['v11', 'v12']);
             $factory2 = $this->factory($definition2, ['v21', 'v22']);
-
-            $definition = ['factory1:v11,v12', 'factory2:v21,v22'];
 
             $parser = new RulesParser([
                 'factory1' => $factory1,
                 'factory2' => $factory2,
             ]);
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition(['factory1:v11,v12', 'factory2:v21,v22']);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test)->to->include->keys(['factory1', 'factory2']);
-            expect($test['factory1'])->to->be->an->instanceof(Rule::class);
-            expect($test['factory2'])->to->be->an->instanceof(Rule::class);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
 
-            $test['factory1']->validate('key', ['key' => 'value'], ['key' => 'value']);
-            $test['factory2']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(2);
+            expect($errors[0]->getRule())->to->be->equal('factory1');
+            expect($errors[0]->getParameters())->to->be->equal(['v11', 'v12']);
+            expect($errors[1]->getRule())->to->be->equal('factory2');
+            expect($errors[1]->getParameters())->to->be->equal(['v21', 'v22']);
 
         });
 
         it('should replace the factory names when the array key is a string', function () {
 
-            $definition1 = $this->definition('key', ['key' => 'value']);
-            $definition2 = $this->definition('key', ['key' => 'value']);
-            $definition3 = $this->definition('key', ['key' => 'value']);
+            $definition1 = $this->definition('key', ['key' => 'value'], ['v11', 'v12']);
+            $definition2 = $this->definition('key', ['key' => 'value'], ['v21', 'v22']);
+            $definition3 = $this->definition('key', ['key' => 'value'], ['v31', 'v32']);
 
             $factory1 = $this->factory($definition1, ['v11', 'v12']);
             $factory2 = $this->factory($definition2, ['v21', 'v22']);
             $factory3 = $this->factory($definition3, ['v31', 'v32']);
-
-            $definition = ['factory1:v11,v12', 'f2' => 'factory2:v21,v22', 'f3' => 'factory3:v31,v32'];
 
             $parser = new RulesParser([
                 'factory1' => $factory1,
@@ -268,18 +264,22 @@ describe('RulesParser', function () {
                 'factory3' => $factory3,
             ]);
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition([
+                'factory1:v11,v12',
+                'f2' => 'factory2:v21,v22',
+                'f3' => 'factory3:v31,v32',
+            ]);
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(3);
-            expect($test)->to->include->keys(['factory1', 'f2', 'f3']);
-            expect($test['factory1'])->to->be->an->instanceof(Rule::class);
-            expect($test['f2'])->to->be->an->instanceof(Rule::class);
-            expect($test['f3'])->to->be->an->instanceof(Rule::class);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
 
-            $test['factory1']->validate('key', ['key' => 'value'], ['key' => 'value']);
-            $test['f2']->validate('key', ['key' => 'value'], ['key' => 'value']);
-            $test['f3']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(3);
+            expect($errors[0]->getRule())->to->be->equal('factory1');
+            expect($errors[0]->getParameters())->to->be->equal(['v11', 'v12']);
+            expect($errors[1]->getRule())->to->be->equal('f2');
+            expect($errors[1]->getParameters())->to->be->equal(['v21', 'v22']);
+            expect($errors[2]->getRule())->to->be->equal('f3');
+            expect($errors[2]->getParameters())->to->be->equal(['v31', 'v32']);
 
         });
 
@@ -288,82 +288,76 @@ describe('RulesParser', function () {
             $definition1 = $this->definition('key', ['key' => 'value']);
             $definition2 = $this->definition('key', ['key' => 'value']);
 
-            $factory1 = $this->factory($definition1, []);
-            $factory2 = $this->factory($definition2, []);
-
-            $definition = 'factory1|factory2';
+            $factory1 = $this->factory($definition1);
+            $factory2 = $this->factory($definition2);
 
             $parser = new RulesParser([
                 'factory1' => $factory1,
                 'factory2' => $factory2,
             ]);
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition('factory1|factory2');
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test)->to->include->keys(['factory1', 'factory2']);
-            expect($test['factory1'])->to->be->an->instanceof(Rule::class);
-            expect($test['factory2'])->to->be->an->instanceof(Rule::class);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
 
-            $test['factory1']->validate('key', ['key' => 'value'], ['key' => 'value']);
-            $test['factory2']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(2);
+            expect($errors[0]->getRule())->to->be->equal('factory1');
+            expect($errors[0]->getParameters())->to->be->equal([]);
+            expect($errors[1]->getRule())->to->be->equal('factory2');
+            expect($errors[1]->getParameters())->to->be->equal([]);
 
         });
 
         it('should return a named array of rules from a string of factories with a parameter', function () {
 
-            $definition1 = $this->definition('key', ['key' => 'value']);
-            $definition2 = $this->definition('key', ['key' => 'value']);
+            $definition1 = $this->definition('key', ['key' => 'value'], ['v1']);
+            $definition2 = $this->definition('key', ['key' => 'value'], ['v2']);
 
             $factory1 = $this->factory($definition1, ['v1']);
             $factory2 = $this->factory($definition2, ['v2']);
-
-            $definition = 'factory1:v1|factory2:v2';
 
             $parser = new RulesParser([
                 'factory1' => $factory1,
                 'factory2' => $factory2,
             ]);
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition('factory1:v1|factory2:v2');
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test)->to->include->keys(['factory1', 'factory2']);
-            expect($test['factory1'])->to->be->an->instanceof(Rule::class);
-            expect($test['factory2'])->to->be->an->instanceof(Rule::class);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
 
-            $test['factory1']->validate('key', ['key' => 'value'], ['key' => 'value']);
-            $test['factory2']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(2);
+            expect($errors[0]->getRule())->to->be->equal('factory1');
+            expect($errors[0]->getParameters())->to->be->equal(['v1']);
+            expect($errors[1]->getRule())->to->be->equal('factory2');
+            expect($errors[1]->getParameters())->to->be->equal(['v2']);
 
         });
 
         it('should return a named array of rules from a string of factories with multiple parameters', function () {
 
-            $definition1 = $this->definition('key', ['key' => 'value']);
-            $definition2 = $this->definition('key', ['key' => 'value']);
+            $definition1 = $this->definition('key', ['key' => 'value'], ['v11', 'v12']);
+            $definition2 = $this->definition('key', ['key' => 'value'], ['v21', 'v22']);
 
             $factory1 = $this->factory($definition1, ['v11', 'v12']);
             $factory2 = $this->factory($definition2, ['v21', 'v22']);
-
-            $definition = 'factory1:v11,v12|factory2:v21,v22';
 
             $parser = new RulesParser([
                 'factory1' => $factory1,
                 'factory2' => $factory2,
             ]);
 
-            $test = $parser->parseRulesDefinition($definition);
+            $test = $parser->parseRulesDefinition('factory1:v11,v12|factory2:v21,v22');
 
-            expect($test)->to->be->an('array');
-            expect($test)->to->have->length(2);
-            expect($test)->to->include->keys(['factory1', 'factory2']);
-            expect($test['factory1'])->to->be->an->instanceof(Rule::class);
-            expect($test['factory2'])->to->be->an->instanceof(Rule::class);
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
 
-            $test['factory1']->validate('key', ['key' => 'value'], ['key' => 'value']);
-            $test['factory2']->validate('key', ['key' => 'value'], ['key' => 'value']);
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(2);
+            expect($errors[0]->getRule())->to->be->equal('factory1');
+            expect($errors[0]->getParameters())->to->be->equal(['v11', 'v12']);
+            expect($errors[1]->getRule())->to->be->equal('factory2');
+            expect($errors[1]->getParameters())->to->be->equal(['v21', 'v22']);
 
         });
 

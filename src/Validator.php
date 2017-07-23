@@ -38,20 +38,16 @@ class Validator
 
     public function validate(array $input = []): ValidationResult
     {
-        $errors = [];
+        $results = [];
 
         foreach ($this->rules as $key => $definition) {
 
             $rules = $this->parser->parseRulesDefinition($definition);
 
-            $expectation = new Expectation($key, $rules);
-
-            $new_errors = $expectation->validate($input);
-
-            $errors = array_merge($errors, $new_errors);
+            $results[$key] = $rules->validate($key, $input);
 
         }
 
-        return new ValidationResult($errors, $this->translator);
+        return new ValidationResult($results, $this->translator);
     }
 }

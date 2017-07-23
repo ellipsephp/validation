@@ -24,7 +24,7 @@ class RulesParser
         throw new \Exception('Rule factory not defined');
     }
 
-    public function parseRulesDefinition($definition): array
+    public function parseRulesDefinition($definition): RulesCollection
     {
         if (is_callable($definition)) {
 
@@ -40,6 +40,8 @@ class RulesParser
 
         if (is_array($definition)) {
 
+            $rules = new RulesCollection;
+
             $keys = array_keys($definition);
 
             return array_reduce($keys, function ($rules, $key) use ($definition) {
@@ -48,16 +50,16 @@ class RulesParser
 
                 $rule = $this->parseRuleDefinition($key, $definition);
 
-                return array_merge($rules, $rule);
+                return $rules->withRule($rule);
 
-            }, []);
+            }, $rules);
 
         }
 
         throw new \Exception('Invalid rules format');
     }
 
-    private function parseRuleDefinition($key, $definition): array
+    private function parseRuleDefinition($key, $definition): Rule
     {
         if (is_string($definition)) {
 
@@ -78,7 +80,7 @@ class RulesParser
             $name = is_string($key) ? $key : $factory_name;
             $validate = $factory($parameters);
 
-            return [$name => new Rule($validate)];
+            return new Rule($name, $validate);
 
         }
 
@@ -86,7 +88,7 @@ class RulesParser
         // a php function cant be used (ex: date).
         if (is_callable($definition)) {
 
-            return [$key => new Rule($definition)];
+            return new Rule((string) $key, $definition);
 
         }
 

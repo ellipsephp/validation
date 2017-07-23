@@ -4,18 +4,23 @@ namespace Ellipse\Validation;
 
 class ValidationResult
 {
-    private $errors;
+    private $results;
     private $translator;
 
-    public function __construct(array $errors = [], Translator $translator)
+    public function __construct(array $results = [], Translator $translator)
     {
-        $this->errors = $errors;
+        $this->results = $results;
         $this->translator = $translator;
+    }
+
+    private function getErrors(): array
+    {
+        return array_filter($this->results, 'count');
     }
 
     public function passed(): bool
     {
-        return count($this->errors) == 0;
+        return  count($this->getErrors()) == 0;
     }
 
     public function failed(): bool
@@ -25,6 +30,16 @@ class ValidationResult
 
     public function getMessages(): array
     {
-        return array_map([$this->translator, 'translate'], $this->errors);
+        $errors = $this->getErrors();
+
+        $keys = array_keys($errors);
+
+        return array_reduce($keys, function ($messages, $key) use ($errors) {
+
+            $translated = $this->translator->getMessages($key, $errors[$key]);
+
+            return array_merge($messages, $translated);
+
+        }, []);
     }
 }

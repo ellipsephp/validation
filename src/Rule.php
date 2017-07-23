@@ -4,11 +4,18 @@ namespace Ellipse\Validation;
 
 class Rule
 {
+    private $name;
     private $validate;
 
-    public function __construct(callable $validate)
+    public function __construct(string $name, callable $validate)
     {
+        $this->name = $name;
         $this->validate = $validate;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     public function validate(string $key, array $scope = [], array $input = []): void

@@ -5,7 +5,7 @@ namespace Ellipse\Validation;
 class Translator
 {
     const DEFAULT_TEMPLATE_KEY = 'default';
-    const FALLBACK_TEMPLATE = 'Validation failed for attribute :attribute.';
+    const FALLBACK_TEMPLATE = 'The :attribute does not pass the validation.';
 
     private $labels;
     private $templates;
@@ -30,54 +30,37 @@ class Translator
         return new Translator($this->labels, $templates);
     }
 
-    public function translate(ValidationError $error): string
+    public function getMessages(string $key, array $errors = []): array
     {
-        // get the errors values.
-        $rule = $error->getRule();
-        $key = $error->getKey();
-        $parameters = $error->getParameters();
+        if (array_key_exists($key, $this->templates)) {
 
-        // make the placeholders.
-        $placeholders = array_merge(['attribute'], array_keys($parameters));
-        $placeholders = array_map([$this, 'getPlaceholder'], $placeholders);
-
-        // make the replacements.
-        $replacements = array_merge([$key], array_values($parameters));
-        $replacements = array_map([$this, 'getTranslatedValue'], $replacements);
-
-        // get the message template
-        $template = $this->getMessageTemplate($key, $rule);
-
-        // default message when not found
-        if (is_null($template)) $template = self::FALLBACK_TEMPLATE;
-
-        // return the message with placeholders replaced.
-        return str_replace($placeholders, $replacements, $template);
-    }
-
-    private function getPlaceholder(string $value): string
-    {
-        return ':' . $value;
-    }
-
-    private function getTranslatedValue($label): string
-    {
-        return (string) ($this->labels[$label] ?? $label);
-    }
-
-    private function getMessageTemplate(string $key, string $rule): ?string
-    {
-        $keyrule = $key . '.' . $rule;
-
-        if ($key != $rule && array_key_exists($keyrule, $this->templates)) {
-
-            return $this->templates[$keyrule];
+            return [$this->translate($this->templates[$key], ['attribute' => $key])];
 
         }
 
-        if (array_key_exists($key, $this->templates)) {
+        return array_reduce($errors, function ($messages, $error) use ($key) {
 
-            return $this->templates[$key];
+            $rule = $error->getRule();
+            $parameters = $error->getParameters();
+
+            $template = $this->getTemplate($key, $rule);
+
+            $message = $this->translate($template, array_merge($parameters, [
+                'attribute' => $key,
+            ]));
+
+            return array_merge($messages, [$message]);
+
+        }, []);
+    }
+
+    private function getTemplate(string $key, string $rule): string
+    {
+        $keyrule = implode('.', [$key, $rule]);
+
+        if (array_key_exists($keyrule, $this->templates)) {
+
+            return $this->templates[$keyrule];
 
         }
 
@@ -89,10 +72,28 @@ class Translator
 
         if (array_key_exists(self::DEFAULT_TEMPLATE_KEY, $this->templates)) {
 
-            return $this->templates[$rule];
+            return $this->templates[self::DEFAULT_TEMPLATE_KEY];
 
         }
 
-        return null;
+        return self::FALLBACK_TEMPLATE;
+    }
+
+    private function translate(string $template, array $parameters): string
+    {
+        $placeholders = array_map([$this, 'getPlaceholder'], array_keys($parameters));
+        $replacements = array_map([$this, 'getTranslatedValue'], array_values($parameters));
+
+        return str_replace($placeholders, $replacements, $template);
+    }
+
+    private function getPlaceholder(string $value): string
+    {
+        return ':' . $value;
+    }
+
+    private function getTranslatedValue($label): string
+    {
+        return (string) ($this->labels[$label] ?? $label);
     }
 }
