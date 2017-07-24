@@ -28,6 +28,7 @@ return [
     'notin'         => 'The :attribute must not be in :set.',
     'numeric'       => 'The :attribute must be numeric.',
     'present'       => 'The :attribute must be present.',
+    'regex'         => 'The :attribute format is invalid.',
     'required'      => 'The :attribute is required.',
     'slug'          => 'The :attribute must contain only letters, numbers, dashes and underscores.',
     'urlactive'     => 'The :attribute must be an active url.',

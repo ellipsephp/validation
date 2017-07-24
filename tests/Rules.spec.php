@@ -110,7 +110,6 @@ describe('NotBlankRule', function () {
 
 });
 
-
 describe('RequiredRule', function () {
 
     beforeEach(function () {
@@ -517,6 +516,38 @@ describe('SlugRule', function () {
 
             expect($this->rule)->with('value1 value2')->to->throw(ValidationException::class);
             expect($this->rule)->with('va#lue')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('RegexRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\RegexRule('/^Value$/i');
+
+    });
+
+    describe('->__invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the key matches the pattern', function () {
+
+            expect($this->rule)->with('value')->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value does not match the pattern', function () {
+
+            expect($this->rule)->with('value1')->to->throw(ValidationException::class);
 
         });
 
