@@ -2,6 +2,9 @@
 
 namespace Ellipse\Validation;
 
+use Ellipse\Validation\Exceptions\RuleFactoryNotDefinedException;
+use Ellipse\Validation\Exceptions\InvalidRuleFormatException;
+
 class RulesParser
 {
     /**
@@ -35,7 +38,7 @@ class RulesParser
 
         }
 
-        throw new \Exception('Rule factory not defined');
+        throw new RuleFactoryNotDefinedException($name);
     }
 
     /**
@@ -76,7 +79,7 @@ class RulesParser
 
         }
 
-        throw new \Exception('Invalid rules format');
+        throw new InvalidRuleFormatException($definition);
     }
 
     /**
@@ -120,6 +123,6 @@ class RulesParser
 
         }
 
-        throw new \Exception('Invalid rules format');
+        throw new InvalidRuleFormatException($definition);
     }
 }

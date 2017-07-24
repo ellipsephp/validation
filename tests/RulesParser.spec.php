@@ -4,6 +4,8 @@ use Ellipse\Validation\Rule;
 use Ellipse\Validation\RulesCollection;
 use Ellipse\Validation\RulesParser;
 use Ellipse\Validation\Exceptions\ValidationException;
+use Ellipse\Validation\Exceptions\RuleFactoryNotDefinedException;
+use Ellipse\Validation\Exceptions\InvalidRuleFormatException;
 
 class RuleParserCallable
 {
@@ -358,6 +360,27 @@ describe('RulesParser', function () {
             expect($errors[0]->getParameters())->to->be->equal(['v11', 'v12']);
             expect($errors[1]->getRule())->to->be->equal('factory2');
             expect($errors[1]->getParameters())->to->be->equal(['v21', 'v22']);
+
+        });
+
+        it('should fail when a rule factory does not exist', function () {
+
+            $parser = new RulesParser;
+
+            expect([$parser, 'parseRulesDefinition'])->with('factory')
+                ->to->throw(RuleFactoryNotDefinedException::class);
+
+        });
+
+        it('should fail when the rule definition is invalid', function () {
+
+            $parser = new RulesParser;
+
+            expect([$parser, 'parseRulesDefinition'])->with(new class {})
+                ->to->throw(InvalidRuleFormatException::class);
+
+            expect([$parser, 'parseRulesDefinition'])->with([new class {}])
+                ->to->throw(InvalidRuleFormatException::class);
 
         });
 

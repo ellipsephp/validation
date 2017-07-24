@@ -21,7 +21,8 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.1"
+        "php": ">=7.1",
+        "mindplay/readable": "^1.1"
     },
     "require-dev": {
         "peridot-php/peridot": "^1.19",
