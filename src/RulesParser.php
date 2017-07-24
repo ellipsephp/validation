@@ -94,7 +94,7 @@ class RulesParser
     {
         if (is_string($definition)) {
 
-            $parts = explode(':', $definition);
+            $parts = preg_split('/:/', $definition, 2);
 
             $factory_name = $parts[0];
             $parameters = $parts[1] ?? null;

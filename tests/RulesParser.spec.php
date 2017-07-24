@@ -363,6 +363,25 @@ describe('RulesParser', function () {
 
         });
 
+        it('should allow columns in parameters values', function () {
+
+            $definition = $this->definition('key', ['key' => 'value'], ['v1:1', 'v1:2']);
+
+            $factory = $this->factory($definition, ['v1:1', 'v1:2']);
+
+            $parser = new RulesParser(['factory' => $factory]);
+
+            $test = $parser->parseRulesDefinition('factory:v1:1,v1:2');
+
+            $errors = $test->validate('key', ['key' => 'value'], ['key' => 'value']);
+
+            expect($errors)->to->be->an('array');
+            expect($errors)->to->have->length(1);
+            expect($errors[0]->getRule())->to->be->equal('factory');
+            expect($errors[0]->getParameters())->to->be->equal(['v1:1', 'v1:2']);
+
+        });
+
         it('should fail when a rule factory does not exist', function () {
 
             $parser = new RulesParser;
