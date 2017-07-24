@@ -2,17 +2,31 @@
 
 namespace Ellipse\Validation;
 
-use Generator;
-
 class RulesParser
 {
+    /**
+     * The list of rule factories.
+     *
+     * @var array
+     */
     private $factories;
 
+    /**
+     * Set up a rules parser with the given list of rules factories.
+     *
+     * @param array $factories
+     */
     public function __construct(array $factories = [])
     {
         $this->factories = $factories;
     }
 
+    /**
+     * Return the rule factory associated to the given name.
+     *
+     * @param string $name
+     * @return callable
+     */
     private function getRuleFactory(string $name): callable
     {
         if (array_key_exists($name, $this->factories)) {
@@ -24,6 +38,14 @@ class RulesParser
         throw new \Exception('Rule factory not defined');
     }
 
+    /**
+     * Return a rules collection from a rule definition. It can be either a
+     * callable, an array of callables, an array of factory names or a string of
+     * rule factory names.
+     *
+     * @param mixed $definition
+     * @return \Ellipse\Validation\RulesCollection
+     */
     public function parseRulesDefinition($definition): RulesCollection
     {
         if (is_callable($definition)) {
@@ -40,8 +62,6 @@ class RulesParser
 
         if (is_array($definition)) {
 
-            $rules = new RulesCollection;
-
             $keys = array_keys($definition);
 
             return array_reduce($keys, function ($rules, $key) use ($definition) {
@@ -52,13 +72,21 @@ class RulesParser
 
                 return $rules->withRule($rule);
 
-            }, $rules);
+            }, new RulesCollection);
 
         }
 
         throw new \Exception('Invalid rules format');
     }
 
+    /**
+     * Return a rule from a rule key and the associated definition. It can be
+     * either a callable or a rule factory name with optional parameters.
+     *
+     * @param string    $key
+     * @param mixed     $definition
+     * @return \Ellipse\Validation\Rule
+     */
     private function parseRuleDefinition($key, $definition): Rule
     {
         if (is_string($definition)) {
@@ -84,8 +112,8 @@ class RulesParser
 
         }
 
-        // is_callable must be AFTER is string, otherwise factories named like a
-        // a php function cant be used (ex: date).
+        // is_callable must be AFTER is_string, otherwise factories named like a
+        // php function can't be used (ex: date).
         if (is_callable($definition)) {
 
             return new Rule((string) $key, $definition);

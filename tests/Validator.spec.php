@@ -12,7 +12,10 @@ describe('Validator', function () {
 
     beforeEach(function () {
 
+        $this->parser = Mockery::mock(RulesParser::class);
         $this->translator = Mockery::mock(Translator::class);
+
+        $this->validator = new Validator([], $this->parser, $this->translator);
 
     });
 
@@ -26,18 +29,16 @@ describe('Validator', function () {
 
         it('should return a new validator with the given labels', function () {
 
-            $validator = Validator::create([], [], $this->translator);
-
             $new_translator = Mockery::mock(Translator::class);
 
             $this->translator->shouldReceive('withLabels')->once()
                 ->with(['key' => 'label'])
                 ->andReturn($new_translator);
 
-            $test = $validator->withLabels(['key' => 'label']);
+            $test = $this->validator->withLabels(['key' => 'label']);
 
             expect($test)->to->be->an->instanceof(Validator::class);
-            expect($test)->to->not->be->equal($validator);
+            expect($test)->to->not->be->equal($this->validator);
 
         });
 
@@ -47,18 +48,16 @@ describe('Validator', function () {
 
         it('should return a new validator with the given templates', function () {
 
-            $validator = Validator::create([], [], $this->translator);
-
             $new_translator = Mockery::mock(Translator::class);
 
             $this->translator->shouldReceive('withTemplates')->once()
                 ->with(['key' => 'template'])
                 ->andReturn($new_translator);
 
-            $test = $validator->withTemplates(['key' => 'template']);
+            $test = $this->validator->withTemplates(['key' => 'template']);
 
             expect($test)->to->be->an->instanceof(Validator::class);
-            expect($test)->to->not->be->equal($validator);
+            expect($test)->to->not->be->equal($this->validator);
 
         });
 
