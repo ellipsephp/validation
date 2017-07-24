@@ -3,8 +3,6 @@
     "type": "library",
     "description": "The validation component of the ellipse framework",
     "keywords": [
-        "Psr-15",
-        "middleware",
         "validation",
         "validator"
     ],
@@ -23,14 +21,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.1",
-        "psr/http-message": "^1.0",
-        "http-interop/http-middleware": "^0.4.0",
-        "container-interop/service-provider": "^0.3.0",
-        "ellipse/binder": "^1.0",
-        "ellipse/contracts-resolver": "^1.0",
-        "ellipse/resolvers-abstract": "^1.0",
-        "ellipse/resolvers-composite": "^1.0"
+        "php": ">=7.1"
     },
     "require-dev": {
         "peridot-php/peridot": "^1.19",
