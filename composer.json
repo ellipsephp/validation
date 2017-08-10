@@ -22,9 +22,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.1",
-        "container-interop/service-provider": "^0.3.0",
-        "mindplay/readable": "^1.1",
-        "ellipse/binder": "^1.0"
+        "mindplay/readable": "^1.1"
     },
     "require-dev": {
         "peridot-php/peridot": "^1.19",
@@ -39,13 +37,6 @@
     "extra": {
         "branch-alias": {
             "dev-master": "1.0.x-dev"
-        },
-        "bindings": {
-            "classes": {
-                "service-providers": [
-                    "Ellipse\\Validation\\ValidationServiceProvider"
-                ]
-            }
         }
     }
 }
