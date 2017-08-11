@@ -60,20 +60,33 @@ class ValidatorFactory
 
     /**
      * Return a validator factory using all the default rule factories and the
-     * templates of the given locale. Allow to pass a translator mostly for
-     * testing purpose.
+     * templates of the given locale.
      *
-     * @param string                            $locale
-     * @param \Ellipse\Validation\Translator    $translator
+     * @param string $locale
      * @return \Ellipse\Validator\ValidatorFactory
      */
-    public static function create(string $locale = 'en', Translator $translator = null): ValidatorFactory
+    public static function create(string $locale = 'en'): ValidatorFactory
     {
-        $factory = new ValidatorFactory([], $translator);
+        $translator = new Translator;
+
+        $factory = new ValidatorFactory($translator);
         $factory = $factory->withBuiltInFactories();
         $factory = $factory->withBuiltInTemplates($locale);
 
         return $factory;
+    }
+
+    /**
+     * Set up a validator factory with a translator and a list of factories to
+     * use.
+     *
+     * @param \Ellipse\Validation\Translator    $translator
+     * @param array                             $factories
+     */
+    public function __construct(Translator $translator, array $factories = [])
+    {
+        $this->factories = $factories;
+        $this->translator = $translator ?: new Translator;
     }
 
     /**
@@ -114,19 +127,6 @@ class ValidatorFactory
     }
 
     /**
-     * Set up a validator factory with a list of rule factories and a translator
-     * to use.
-     *
-     * @param array                             $factories
-     * @param \Ellipse\Validation\Translator    $translator
-     */
-    private function __construct(array $factories = [], Translator $translator = null)
-    {
-        $this->factories = $factories;
-        $this->translator = $translator ?: new Translator;
-    }
-
-    /**
      * Return a validator using the given rules.
      *
      * @param array $rules
@@ -150,7 +150,7 @@ class ValidatorFactory
     {
         $factories = array_merge($this->factories, [$name => $factory]);
 
-        return new ValidatorFactory($factories, $this->translator);
+        return new ValidatorFactory($this->translator, $factories);
     }
 
     /**
@@ -164,7 +164,7 @@ class ValidatorFactory
     {
         $translator = $this->translator->withLabels($labels);
 
-        return new ValidatorFactory($this->factories, $translator);
+        return new ValidatorFactory($translator, $this->factories);
     }
 
     /**
@@ -178,6 +178,6 @@ class ValidatorFactory
     {
         $translator = $this->translator->withTemplates($templates);
 
-        return new ValidatorFactory($this->factories, $translator);
+        return new ValidatorFactory($translator, $this->factories);
     }
 }

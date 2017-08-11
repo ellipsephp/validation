@@ -10,13 +10,7 @@ describe('ValidatorFactory', function () {
 
         $this->translator = Mockery::mock(Translator::class);
 
-        // allow the use of built in templates with ::create to work.
-        $this->translator->shouldReceive('withTemplates')->andReturn($this->translator);
-
-        $this->factory = ValidatorFactory::create('en', $this->translator);
-
-        // reset expectations.
-        Mockery::close();
+        $this->factory = new ValidatorFactory($this->translator);
 
     });
 
@@ -28,9 +22,11 @@ describe('ValidatorFactory', function () {
 
     describe('::create()', function () {
 
-        it('should return a new validator factory with the default factories and default messages', function () {
+        it('should return a new ValidatorFactory', function () {
 
-            expect($this->factory)->to->be->an->instanceof(ValidatorFactory::class);
+            $test = ValidatorFactory::create();
+
+            expect($test)->to->be->an->instanceof(ValidatorFactory::class);
 
         });
 
@@ -65,11 +61,8 @@ describe('ValidatorFactory', function () {
 
         it('should return a new validator factory with the given labels', function () {
 
-            $new_translator = Mockery::mock(Translator::class);
-
             $this->translator->shouldReceive('withLabels')->once()
-                ->with(['key' => 'label'])
-                ->andReturn($new_translator);
+                ->with(['key' => 'label']);
 
             $test = $this->factory->withDefaultLabels(['key' => 'label']);
 
@@ -84,11 +77,8 @@ describe('ValidatorFactory', function () {
 
         it('should return a new validator factory with the given templates', function () {
 
-            $new_translator = Mockery::mock(Translator::class);
-
             $this->translator->shouldReceive('withTemplates')->once()
-                ->with(['key' => 'template'])
-                ->andReturn($new_translator);
+                ->with(['key' => 'template']);
 
             $test = $this->factory->withDefaultTemplates(['key' => 'template']);
 
