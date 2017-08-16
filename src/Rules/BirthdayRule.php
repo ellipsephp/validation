@@ -12,15 +12,13 @@ class BirthdayRule
 
     public function __construct($age = 18)
     {
-        $age = filter_var($age, FILTER_VALIDATE_INT);
-
-        if ($age === false || $age <= 0) {
+        if ((int) $age <= 0) {
 
             throw new InvalidArgumentException('The age must be a positive integer');
 
         }
 
-        $this->age = $age;
+        $this->age = (int) $age;
     }
 
     public function __invoke($value)

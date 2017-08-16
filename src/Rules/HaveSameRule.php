@@ -10,12 +10,12 @@ class HaveSameRule
 {
     private $field;
 
-    public function __construct(string $field)
+    public function __construct($field)
     {
-        $this->field = $field;
+        $this->field = (string) $field;
     }
 
-    public function __invoke($value, string $key, array $scope)
+    public function __invoke($value, string $key = '*', array $scope = [])
     {
         if ($value !== '*') {
 

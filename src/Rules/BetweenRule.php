@@ -24,7 +24,7 @@ class BetweenRule
 
         catch (ValidationException $e) {
 
-            throw new InvalidArgumentException('The min value is after the max value');
+            throw new InvalidArgumentException('The min value must be smaller than the max value');
 
         }
     }

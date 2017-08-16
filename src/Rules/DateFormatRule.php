@@ -8,9 +8,9 @@ class DateFormatRule
 {
     private $format;
 
-    public function __construct(string $format)
+    public function __construct($format)
     {
-        $this->format = $format;
+        $this->format = (string) $format;
     }
 
     public function __invoke($value)

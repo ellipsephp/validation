@@ -2,6 +2,7 @@
 
 namespace Ellipse\Validation\Rules;
 
+use InvalidArgumentException;
 use LogicException;
 
 use Psr\Http\Message\UploadedFileInterface;
@@ -14,7 +15,13 @@ class SizeRule
 
     public function __construct($limit)
     {
-        $this->limit = $limit;
+        if ((int) $limit <= 0) {
+
+            throw new InvalidArgumentException('The size limit must be a positive integer');
+
+        }
+
+        $this->limit = (int) $limit;
     }
 
     public function __invoke($value)

@@ -629,15 +629,14 @@ describe('DateAfterRule', function () {
 
     beforeEach(function () {
 
+        $this->factory = function ($limit) { return new Rules\DateAfterRule($limit); };
         $this->rule = new Rules\DateAfterRule('2017-07-22');
 
     });
 
     it('should fail when the limit is not a string representation of a date', function () {
 
-        $factory = function ($limit) { return new Rules\DateAfterRule($limit); };
-
-        expect($factory)->with('limit')->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with('limit')->to->throw(InvalidArgumentException::class);
 
     });
 
@@ -676,15 +675,14 @@ describe('DateBeforeRule', function () {
 
     beforeEach(function () {
 
+        $this->factory = function ($limit) { return new Rules\DateBeforeRule($limit); };
         $this->rule = new Rules\DateBeforeRule('2017-07-22');
 
     });
 
     it('should fail when the limit is not a string representation of a date', function () {
 
-        $factory = function ($limit) { return new Rules\DateBeforeRule($limit); };
-
-        expect($factory)->with('limit')->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with('limit')->to->throw(InvalidArgumentException::class);
 
     });
 
@@ -784,12 +782,11 @@ describe('BirthdayRule', function () {
 
     });
 
-    it('should fail when either the age is not a positive integer', function () {
+    it('should fail when the age is not a positive integer', function () {
 
         expect($this->factory)->with('limit')->to->throw(InvalidArgumentException::class);
-        expect($this->factory)->with('0')->to->throw(InvalidArgumentException::class);
-        expect($this->factory)->with('-1')->to->throw(InvalidArgumentException::class);
-        expect($this->factory)->with('1.1')->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with(0)->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with(-1)->to->throw(InvalidArgumentException::class);
 
     });
 
@@ -854,7 +851,7 @@ describe('MinRule', function () {
 
         it('should fail when the value is not a string, an array or a countable object', function () {
 
-            expect($this->rule)->with(function () {})->to->throw(InvalidArgumentException::class);
+            expect($this->rule)->with(function () {})->to->throw(LogicException::class);
 
         });
 
@@ -972,7 +969,7 @@ describe('MaxRule', function () {
 
         it('should fail when the value is not a string, an array or a countable object', function () {
 
-            expect($this->rule)->with(function () {})->to->throw(InvalidArgumentException::class);
+            expect($this->rule)->with(function () {})->to->throw(LogicException::class);
 
         });
 
@@ -1088,19 +1085,11 @@ describe('BetweenRule', function () {
 
     });
 
-    it('should fail when the max limit is not numeric', function () {
-
-        $factory = function ($min, $max) { return new Rules\BetweenRule($min, $max); };
-
-        expect($factory)->with(10, 'limit')->to->throw(InvalidArgumentException::class);
-
-    });
-
     describe('->__invoke()', function () {
 
         it('should fail when the value is not a string, an array or a countable object', function () {
 
-            expect($this->rule)->with(function () {})->to->throw(InvalidArgumentException::class);
+            expect($this->rule)->with(function () {})->to->throw(LogicException::class);
 
         });
 
@@ -1660,6 +1649,7 @@ describe('SizeRule', function () {
 
     beforeEach(function () {
 
+        $this->factory = function ($limit) { return new Rules\SizeRule($limit); };
         $this->rule = new Rules\SizeRule(2 * 1024);
 
     });
@@ -1667,6 +1657,14 @@ describe('SizeRule', function () {
     afterEach(function () {
 
         Mockery::close();
+
+    });
+
+    it('should fail when the limit is not numeric', function () {
+
+        expect($this->factory)->with('limit')->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with(0)->to->throw(InvalidArgumentException::class);
+        expect($this->factory)->with(-1)->to->throw(InvalidArgumentException::class);
 
     });
 
@@ -1740,7 +1738,7 @@ describe('HaveDifferentRule', function () {
 
         it('should fail when the value is not *', function () {
 
-            expect($this->rule)->with('value')->to->not->throw(LogicException::class);
+            expect($this->rule)->with('value')->to->throw(LogicException::class);
 
         });
 
@@ -1786,7 +1784,7 @@ describe('HaveSameRule', function () {
 
         it('should fail when the value is not *', function () {
 
-            expect($this->rule)->with('value')->to->not->throw(LogicException::class);
+            expect($this->rule)->with('value')->to->throw(LogicException::class);
 
         });
 

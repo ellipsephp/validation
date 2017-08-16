@@ -9,11 +9,11 @@ class EqualsRule
     private $other;
     private $in_scope;
 
-    public function __construct(string $other)
+    public function __construct($other)
     {
-        $in_scope = substr($other, 0, 1) === '>';
+        $in_scope = substr((string) $other, 0, 1) === '>';
 
-        $this->other = str_replace('>', '', $other);
+        $this->other = str_replace('>', '', (string) $other);
         $this->in_scope = $in_scope;
     }
 

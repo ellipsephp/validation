@@ -8,9 +8,9 @@ class RegexRule
 {
     private $pattern;
 
-    public function __construct(string $pattern)
+    public function __construct($pattern)
     {
-        $this->pattern = $pattern;
+        $this->pattern = (string) $pattern;
     }
 
     public function __invoke($value)

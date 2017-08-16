@@ -10,7 +10,7 @@ class DateAfterRule
 {
     private $format;
 
-    public function __construct(string $limit)
+    public function __construct($limit)
     {
         try {
 

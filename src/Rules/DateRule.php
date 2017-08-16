@@ -10,7 +10,7 @@ class DateRule
     {
         if (is_null($value)) return;
 
-        if (strtotime($value) !== false) return;
+        if (strtotime((string) $value) !== false) return;
 
         throw new ValidationException;
     }

@@ -2,8 +2,9 @@
 
 namespace Ellipse\Validation\Rules;
 
-use \InvalidArgumentException;
-use \Countable;
+use InvalidArgumentException;
+use LogicException;
+use Countable;
 
 use Ellipse\Validation\Exceptions\ValidationException;
 
@@ -19,7 +20,7 @@ class MaxRule
 
         }
 
-        $this->limit = $limit;
+        $this->limit = $limit + 0;
     }
 
     public function __invoke($value)
@@ -50,7 +51,7 @@ class MaxRule
 
         }
 
-        throw new InvalidArgumentException('The given value is not countable');
+        throw new LogicException('The value under validation is not countable');
     }
 
     public function getLimit()

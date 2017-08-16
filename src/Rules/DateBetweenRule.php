@@ -11,7 +11,7 @@ class DateBetweenRule
     private $min;
     private $max;
 
-    public function __construct(string $min, string $max)
+    public function __construct($min, $max)
     {
         $this->min = new DateAfterRule($min);
         $this->max = new DateBeforeRule($max);
