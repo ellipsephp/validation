@@ -155,7 +155,7 @@ describe('ArrayRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -187,7 +187,7 @@ describe('BooleanRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -220,7 +220,7 @@ describe('NumericRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -259,7 +259,7 @@ describe('IntegerRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -300,7 +300,7 @@ describe('EmailRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -332,7 +332,7 @@ describe('IpRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -364,7 +364,7 @@ describe('UrlRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -398,7 +398,7 @@ describe('UrlActiveRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -431,7 +431,7 @@ describe('AlphaRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -465,7 +465,7 @@ describe('AlphaNumRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -498,7 +498,7 @@ describe('SlugRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -563,7 +563,7 @@ describe('DateRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -595,7 +595,7 @@ describe('DateFormatRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -641,7 +641,7 @@ describe('DateAfterRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -688,7 +688,7 @@ describe('DateBeforeRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -741,7 +741,7 @@ describe('DateBetweenRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -793,7 +793,7 @@ describe('BirthdayRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -844,7 +844,7 @@ describe('MinRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -962,7 +962,7 @@ describe('MaxRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -1096,7 +1096,7 @@ describe('BetweenRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should fail when the value is not a string, an array or a countable object', function () {
 
@@ -1218,7 +1218,7 @@ describe('EqualsRule', function () {
 
         });
 
-        describe('->invoke()', function () {
+        describe('->__invoke()', function () {
 
             it('should not fail when the value is null', function () {
 
@@ -1256,7 +1256,7 @@ describe('EqualsRule', function () {
 
         });
 
-        describe('->invoke()', function () {
+        describe('->__invoke()', function () {
 
             it('should not fail when the value is null', function () {
 
@@ -1296,7 +1296,7 @@ describe('DifferentRule', function () {
 
         });
 
-        describe('->invoke()', function () {
+        describe('->__invoke()', function () {
 
             it('should not fail when the value is null', function () {
 
@@ -1334,7 +1334,7 @@ describe('DifferentRule', function () {
 
         });
 
-        describe('->invoke()', function () {
+        describe('->__invoke()', function () {
 
             it('should not fail when the value is null', function () {
 
@@ -1372,7 +1372,7 @@ describe('InRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -1404,7 +1404,7 @@ describe('NotInRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -1436,7 +1436,7 @@ describe('AcceptedRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -1471,7 +1471,7 @@ describe('NotAcceptedRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should not fail when the value is null', function () {
 
@@ -1498,6 +1498,236 @@ describe('NotAcceptedRule', function () {
 
 });
 
+describe('FileRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\FileRule;
+
+    });
+
+    describe('->__invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is a file', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            expect($this->rule)->with($file)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a file', function () {
+
+            expect($this->rule)->with('value')->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('ExtensionRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\ExtensionRule('png', 'jpg');
+
+    });
+
+    afterEach(function () {
+
+        Mockery::close();
+
+    });
+
+    describe('->__invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is a file with a listed extension', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            $file->shouldReceive('getClientFilename')->once()->andReturn('file.jpg');
+
+            expect($this->rule)->with($file)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a file', function () {
+
+            expect($this->rule)->with('value')->to->throw(LogicException::class);
+
+        });
+
+        it('should fail when the value is a file with a undefined name', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            $file->shouldReceive('getClientFilename')->once()->andReturn(null);
+
+            expect($this->rule)->with($file)->to->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is a file with a non-listed extension', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            $file->shouldReceive('getClientFilename')->once()->andReturn('file.avi');
+
+            expect($this->rule)->with($file)->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('MimeTypeRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\MimeTypeRule('image/png', 'image/jpg');
+
+    });
+
+    afterEach(function () {
+
+        Mockery::close();
+
+    });
+
+    describe('->__invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is a file with a listed mime type', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            $file->shouldReceive('getClientMediaType')->once()->andReturn('image/jpg');
+
+            expect($this->rule)->with($file)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a file', function () {
+
+            expect($this->rule)->with('value')->to->throw(LogicException::class);
+
+        });
+
+        it('should fail when the value is a file with a undefined mime type', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            $file->shouldReceive('getClientMediaType')->once()->andReturn(null);
+
+            expect($this->rule)->with($file)->to->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is a file with a non-listed mime type', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            $file->shouldReceive('getClientMediaType')->once()->andReturn('video/avi');
+
+            expect($this->rule)->with($file)->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
+describe('SizeRule', function () {
+
+    beforeEach(function () {
+
+        $this->rule = new Rules\SizeRule(2 * 1024);
+
+    });
+
+    afterEach(function () {
+
+        Mockery::close();
+
+    });
+
+    describe('->__invoke()', function () {
+
+        it('should not fail when the value is null', function () {
+
+            expect($this->rule)->with(null)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is a file with a size smaller than the limit', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            $file->shouldReceive('getSize')->once()->andReturn(1024 * 1024);
+
+            expect($this->rule)->with($file)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should not fail when the value is a file with a size equal to the limit', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            $file->shouldReceive('getSize')->once()->andReturn(1024 * 1024 * 2);
+
+            expect($this->rule)->with($file)->to->not->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is not a file', function () {
+
+            expect($this->rule)->with('value')->to->throw(LogicException::class);
+
+        });
+
+        it('should fail when the value is a file with a undefined size', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            $file->shouldReceive('getSize')->once()->andReturn(null);
+
+            expect($this->rule)->with($file)->to->throw(ValidationException::class);
+
+        });
+
+        it('should fail when the value is a file with a size greater than the limit', function () {
+
+            $file = Mockery::mock(UploadedFileInterface::class);
+
+            $file->shouldReceive('getSize')->once()->andReturn(1024 * 1024 * 2 + 1);
+
+            expect($this->rule)->with($file)->to->throw(ValidationException::class);
+
+        });
+
+    });
+
+});
+
 describe('HaveDifferentRule', function () {
 
     beforeEach(function () {
@@ -1506,7 +1736,7 @@ describe('HaveDifferentRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should fail when the value is not *', function () {
 
@@ -1552,7 +1782,7 @@ describe('HaveSameRule', function () {
 
     });
 
-    describe('->invoke()', function () {
+    describe('->__invoke()', function () {
 
         it('should fail when the value is not *', function () {
 
